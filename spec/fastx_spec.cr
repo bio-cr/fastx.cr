@@ -105,8 +105,8 @@ describe Fastx do
     tempfile.delete
   end
 
-  it "should raise ArgumentError for unknown format" do
-    expect_raises(ArgumentError, "Unknown format: unknown_file.xyz") do
+  it "should raise UnsupportedFormatError for unknown format" do
+    expect_raises(Fastx::UnsupportedFormatError, "Unknown format: unknown_file.xyz") do
       Fastx.open("unknown_file.xyz", "r")
     end
   end
@@ -175,6 +175,12 @@ describe Fastx do
     Fastx.normalize_base(88u8, iupac: true).should eq 78u8 # X -> N (unknown)
     Fastx.normalize_base(90u8, iupac: true).should eq 78u8 # Z -> N (unknown)
     Fastx.normalize_base(49u8, iupac: true).should eq 78u8 # 1 -> N (unknown)
+  end
+
+  it "should support strict base normalization" do
+    expect_raises(Fastx::InvalidBaseError) do
+      Fastx.normalize_base('X'.ord.to_u8, strict: true)
+    end
   end
 
   it "should encode bases (default: iupac=false)" do

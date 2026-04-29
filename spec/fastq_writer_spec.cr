@@ -44,4 +44,25 @@ describe Fastx::Fastq::Writer do
     reader.close
     tempfile.delete
   end
+
+  it "should reject records with mismatched sequence and quality lengths" do
+    tempfile = File.tempfile("invalid_write.fq")
+    writer = Fastx::Fastq::Writer.new(tempfile.path)
+
+    expect_raises(ArgumentError, /sequence and quality lengths differ/) do
+      writer.write("bad", "ACGT", "!!!")
+    end
+
+    writer.close
+    tempfile.delete
+  end
+
+  it "should support writing to IO::Memory" do
+    io = IO::Memory.new
+    writer = Fastx::Fastq::Writer.new(io)
+    writer.write("test", "ACGT", "!!!!")
+
+    io.to_s.should eq("@test\nACGT\n+\n!!!!\n")
+    writer.close
+  end
 end

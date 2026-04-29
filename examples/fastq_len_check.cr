@@ -1,23 +1,23 @@
 require "../src/fastx"
 
 if ARGV.size != 1
-  STDERR.puts("Usage: #{PROGRAM_NAME} <fastq>")
+  STDERR.puts "Usage: #{PROGRAM_NAME} <reads.fq|reads.fq.gz>"
   exit 1
 end
 
-fname = ARGV[0]
+path = ARGV[0]
+count = 0
 
-true_count = 0
-false_count = 0
-
-Fastx::Fastq::Reader.open(fname) do |reader|
-  reader.each do |name, sequence, quality|
-    sequence_size = sequence.size
-    quality_size = quality.size
-    count_check = sequence_size == quality_size
-    count_check ? (true_count += 1) : (false_count += 1)
-    puts "#{name}\t#{sequence.size}\t#{quality.size}\t#{count_check}"
+begin
+  Fastx::Fastq::Reader.open(path) do |reader|
+    reader.each do |identifier, sequence, quality|
+      count += 1
+      puts "#{identifier}\t#{sequence.bytesize}\t#{quality.bytesize}"
+    end
   end
-end
 
-STDERR.puts("True: #{true_count}\tFalse: #{false_count}")
+  STDERR.puts "OK: #{count} records"
+rescue ex : Fastx::InvalidFormatError
+  STDERR.puts ex.message
+  exit 2
+end

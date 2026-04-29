@@ -3,212 +3,171 @@
 [![test](https://github.com/bio-cr/fastx.cr/actions/workflows/ci.yml/badge.svg)](https://github.com/bio-cr/fastx.cr/actions/workflows/ci.yml)
 [![Docs Latest](https://img.shields.io/badge/docs-latest-blue.svg)](https://bio-cr.github.io/fastx.cr/)
 
-A Crystal library for reading and writing FASTA and FASTQ files.
+Small FASTA/FASTQ I/O for Crystal.
 
 ## Installation
 
-1. Add the dependency to your `shard.yml`:
+Add this to `shard.yml`:
 
-   ```yaml
-   dependencies:
-     fastx:
-       github: bio-cr/fastx.c
-   ```
+```yaml
+dependencies:
+  fastx:
+    github: bio-cr/fastx.cr
+```
 
-2. Run `shards install`
+Then run:
 
-## Usage
+```sh
+shards install
+```
 
-### Reading FASTA files
+## What It Does
+
+- Read FASTA
+- Read FASTQ
+- Write FASTA
+- Write FASTQ
+- Auto-handle gzip when the path ends with `.gz`
+- Stream large files with low-allocation readers
+
+## Read FASTA
 
 ```crystal
 require "fastx"
 
-# Using Reader directly
-reader = Fastx::Fasta::Reader.new("file.fa")
-reader.each do |name, sequence|
-  puts "Name: #{name}"
-  puts "Sequence: #{sequence.to_s}"
-end
-reader.close
-
-# Using block (automatically closes)
-Fastx::Fasta::Reader.open("file.fa") do |reader|
-  reader.each do |name, sequence|
-    puts "Name: #{name}"
-    puts "Sequence: #{sequence.to_s}"
-  end
-end
-
-# Using each_copy for String copies (avoids buffer reuse issues)
-Fastx::Fasta::Reader.open("file.fa") do |reader|
-  reader.each_copy do |name, sequence|
-    puts "Name: #{name}"
-    puts "Sequence: #{sequence}" # sequence is already a String
+Fastx::Fasta::Reader.open("reads.fa.gz") do |reader|
+  reader.each do |header, sequence|
+    puts "#{header}\t#{sequence.bytesize}"
   end
 end
 ```
 
-### Reading FASTQ files
+Use `#each_copy` if you need to keep records after the current iteration:
 
 ```crystal
-# Using Reader directly
-reader = Fastx::Fastq::Reader.new("file.fq")
-reader.each do |identifier, sequence, quality|
-  puts "ID: #{identifier}"
-  puts "Sequence: #{sequence.to_s}"
-  puts "Quality: #{quality.to_s}"
+Fastx::Fasta::Reader.open("reads.fa") do |reader|
+  reader.each_copy do |header, sequence|
+    stored_header = header
+    stored_sequence = sequence
+  end
 end
-reader.close
+```
 
-# Using block (automatically closes)
-Fastx::Fastq::Reader.open("file.fq") do |reader|
+## Read FASTQ
+
+```crystal
+Fastx::Fastq::Reader.open("reads.fq.gz") do |reader|
   reader.each do |identifier, sequence, quality|
-    puts "ID: #{identifier}"
-    puts "Sequence: #{sequence.to_s}"
-    puts "Quality: #{quality.to_s}"
+    puts "#{identifier}\t#{sequence.bytesize}\t#{quality.bytesize}"
   end
 end
+```
 
-# Using each_copy for String copies (avoids buffer reuse issues)
-Fastx::Fastq::Reader.open("file.fq") do |reader|
+Use `#each_copy` if you need safe `String` copies:
+
+```crystal
+Fastx::Fastq::Reader.open("reads.fq") do |reader|
   reader.each_copy do |identifier, sequence, quality|
-    puts "ID: #{identifier}"
-    puts "Sequence: #{sequence}" # sequence is already a String
-    puts "Quality: #{quality}"   # quality is already a String
+    saved_id = identifier
+    saved_sequence = sequence
+    saved_quality = quality
   end
 end
 ```
 
-### Writing FASTA files
+## Write FASTA
 
 ```crystal
-# Using Writer directly
-writer = Fastx::Fasta::Writer.new("output.fa")
-writer.write("seq1", "ACGTACGT")
-writer.write("seq2", "TGCATGCA")
-writer.close
-
-# Using block (automatically closes)
-Fastx::Fasta::Writer.open("output.fa") do |writer|
+Fastx::Fasta::Writer.open("out.fa", line_width: 80) do |writer|
   writer.write("seq1", "ACGTACGT")
-  writer.write("seq2", "TGCATGCA")
+  writer.write("seq2", "TTTTCCCC")
 end
 ```
 
-### Writing FASTQ files
+Set `line_width: nil` to write one sequence line per record.
+
+## Write FASTQ
 
 ```crystal
-# Using Writer directly
-writer = Fastx::Fastq::Writer.new("output.fq")
-writer.write("seq1", "ACGTACGT", "!!!!!!!!")
-writer.write("seq2", "TGCATGCA", "~~~~~~~~")
-writer.close
-
-# Using block (automatically closes)
-Fastx::Fastq::Writer.open("output.fq") do |writer|
-  writer.write("seq1", "ACGTACGT", "!!!!!!!!")
-  writer.write("seq2", "TGCATGCA", "~~~~~~~~")
+Fastx::Fastq::Writer.open("out.fq.gz") do |writer|
+  writer.write("seq1", "ACGT", "!!!!")
+  writer.write("seq2", "TTTT", "####")
 end
 ```
 
-<details>
-<summary>Format detection and specification</summary>
+`Fastx::Fastq::Writer` raises `ArgumentError` if sequence and quality lengths differ.
 
-### Format detection by file extension
+## Use Existing IO
+
+Path-based APIs auto-detect gzip from the filename. IO-based APIs do not.
 
 ```crystal
-# Format is inferred from file extension, but type casting is still required
-Fastx.open("file.fa") do |reader|
-  reader.as(Fastx::Fasta::Reader).each do |name, sequence|
-    puts "#{name}: #{sequence.to_s}"
-  end
-end
+io = IO::Memory.new("@seq1\nACGT\n+\n!!!!\n")
+reader = Fastx::Fastq::Reader.new(io)
 
-Fastx.open("file.fq") do |reader|
-  reader.as(Fastx::Fastq::Reader).each do |id, sequence, quality|
-    puts "#{id}: #{sequence.to_s}"
+reader.each_copy do |identifier, sequence, quality|
+  puts "#{identifier}\t#{sequence}\t#{quality}"
+end
+```
+
+```crystal
+io = IO::Memory.new
+writer = Fastx::Fasta::Writer.new(io, line_width: 4)
+writer.write("seq1", "ACGTGG")
+puts io.to_s
+```
+
+## Format Detection
+
+`Fastx.open` is a convenience API based on file extension:
+
+```crystal
+Fastx.open("reads.fa") do |reader|
+  reader.as(Fastx::Fasta::Reader).each do |header, sequence|
+    puts "#{header}\t#{sequence.bytesize}"
   end
 end
 ```
 
-### Explicit format specification
+You can also pass the format explicitly:
 
 ```crystal
-# Using Format enum for explicit format specification
-Fastx.open("data", "r", Fastx::Format::FASTA) do |reader|
-  reader.as(Fastx::Fasta::Reader).each do |name, sequence|
-    puts "#{name}: #{sequence.to_s}"
-  end
-end
-
 Fastx.open("output", "w", Fastx::Format::FASTQ) do |writer|
   writer.as(Fastx::Fastq::Writer).write("seq1", "ACGT", "!!!!")
 end
 ```
 
-</details>
+## Behavior And Limits
 
-### Gzip support
+- `Reader#each` reuses internal buffers for performance.
+- Values yielded by `#each` are only valid until the next iteration.
+- Use `#each_copy` if you want values you can store safely.
+- Readers are one-pass. Create a new reader to read again.
+- Reader and writer instances are not thread-safe.
+- `Fastx::Fastq::Reader` currently supports four-line FASTQ records only.
+- Multi-line FASTQ is not supported.
+- FASTQ reader and writer validate sequence/quality length equality.
 
-Both reading and writing of gzip-compressed files are supported automatically when the filename ends with `.gz`.
-
-```crystal
-# Reads gzip-compressed FASTA
-Fastx::Fasta::Reader.open("file.fa.gz") do |reader|
-  reader.each do |name, sequence|
-    puts "#{name}: #{sequence.to_s}"
-  end
-end
-
-# Writes gzip-compressed FASTQ
-Fastx::Fastq::Writer.open("output.fq.gz") do |writer|
-  writer.write("seq1", "ACGT", "!!!!")
-end
-```
-
-Note: Gzip refers to standard gzip, not BGZF (bgzip)
-
-### Base encoding
-
-Convert DNA sequences to UInt8 arrays suitable for byte-wise or array processing:
+## Base Encoding
 
 ```crystal
-# Encode bases to UInt8 array (A,C,G,T,N → 65,67,71,84,78; others → 78)
 encoded = Fastx.encode_bases("AcGtNxyz")
-# Returns: Slice[65u8, 67u8, 71u8, 84u8, 78u8, 78u8, 78u8, 78u8]
-
-# Decode UInt8 array back to DNA string
 decoded = Fastx.decode_bases(encoded)
-# Returns: "ACGTNNNN"
 ```
 
-### Quality encoding
-
-Convert quality strings to Phred score arrays and back:
+Unknown bases are normalized to `N` by default. Use `strict: true` to raise:
 
 ```crystal
-# Encode quality string to Phred scores (Phred+33 by default)
-phred_scores = Fastx.encode_phred("IIIIHGF") # => [40_u8, 40_u8, 40_u8, 40_u8, 39_u8, 38_u8, 37_u8]
-
-# Decode Phred scores to quality string
-quality_str = Fastx.decode_phred([40_u8, 40_u8, 40_u8, 40_u8, 39_u8, 38_u8, 37_u8]) # => "IIIIHGF"
-
-# Specify offset for Phred+64
-phred_scores64 = Fastx.encode_phred("dddd", offset: 64)
-quality_str64 = Fastx.decode_phred([36_u8, 36_u8, 36_u8, 36_u8], offset: 64)
+Fastx.normalize_base('X'.ord.to_u8, strict: true)
 ```
 
-## Contributing
+## Quality Encoding
 
-1. Fork it (<https://github.com/bio-cr/fastx/fork>)
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create a new Pull Request
+```crystal
+scores = Fastx.encode_phred("IIIIHGF")
+quality = Fastx.decode_phred(scores)
+```
 
 ## License
 
 MIT License
-
-This project includes code generated by AI.

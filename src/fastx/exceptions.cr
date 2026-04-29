@@ -1,5 +1,8 @@
 module Fastx
-  class FastxError < Exception
+  class Error < Exception
+  end
+
+  class FastxError < Error
   end
 
   class InvalidCharacterError < FastxError
@@ -22,5 +25,20 @@ module Fastx
       ERROR
       super(msg)
     end
+  end
+
+  class InvalidBaseError < FastxError
+    def initialize(base : UInt8)
+      super("Invalid base: #{base.chr.inspect}")
+    end
+  end
+
+  class ReaderConsumedError < FastxError
+    def initialize(message = "Reader is one-pass only and has already been consumed")
+      super(message)
+    end
+  end
+
+  class UnsupportedFormatError < FastxError
   end
 end

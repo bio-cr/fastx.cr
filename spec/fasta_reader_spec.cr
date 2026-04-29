@@ -102,4 +102,28 @@ describe Fastx::Fasta::Reader do
     reader.close
     tempfile.delete
   end
+
+  it "should support reading from IO::Memory" do
+    io = IO::Memory.new(">seq1\nAC\nGT\n>seq2\nTT\n")
+    reader = Fastx::Fasta::Reader.new(io)
+    records = [] of Tuple(String, String)
+
+    reader.each_copy do |name, sequence|
+      records << {name, sequence}
+    end
+
+    records.should eq([{ "seq1", "ACGT" }, { "seq2", "TT" }])
+    reader.close
+  end
+
+  it "should be one-pass" do
+    reader = Fastx::Fasta::Reader.new(Path[__DIR__, "fixtures/moo.fa"])
+    reader.each { |name, sequence| }
+
+    expect_raises(Fastx::ReaderConsumedError) do
+      reader.each { |name, sequence| }
+    end
+
+    reader.close
+  end
 end

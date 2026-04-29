@@ -40,11 +40,19 @@ module Fastx
 
   # Converts a quality string to an array of Phred scores.
   def self.encode_phred(quality : String, offset = 33) : Array(UInt8)
-    quality.chars.map { |c| (c.ord - offset).to_u8 }
+    scores = Array(UInt8).new(quality.bytesize)
+    quality.to_slice.each do |byte|
+      scores << (byte - offset).to_u8
+    end
+    scores
   end
 
   # Converts an array of Phred scores to a quality string.
   def self.decode_phred(scores : Enumerable(UInt8), offset = 33) : String
-    scores.map { |s| (s + offset).chr }.join
+    String.build do |io|
+      scores.each do |score|
+        io << (score + offset).chr
+      end
+    end
   end
 end

@@ -19,7 +19,7 @@ module Fastx
       when /\.fasta$/, /\.fa$/, /\.fasta.gz$/, /\.fa.gz$/
         Fasta.open(filename, mode) { |f| yield f }
       else
-        raise ArgumentError.new("Unknown format: #{filename}")
+        raise UnsupportedFormatError.new("Unknown format: #{filename}")
       end
     end
   end
@@ -39,7 +39,7 @@ module Fastx
       when /\.fasta$/, /\.fa$/, /\.fasta.gz$/, /\.fa.gz$/
         Fasta.open(filename, mode)
       else
-        raise ArgumentError.new("Unknown format: #{filename}")
+        raise UnsupportedFormatError.new("Unknown format: #{filename}")
       end
     end
   end
@@ -48,7 +48,7 @@ module Fastx
   # When iupac is true, supports IUPAC nucleotide codes (R, Y, S, W, K, M, B, D, H, V).
   # When iupac is false, only standard bases (A, C, G, T, N) are preserved.
   # Non-recognized characters are converted to N (78u8).
-  def self.normalize_base(c : UInt8, *, iupac : Bool = false) : UInt8
+  def self.normalize_base(c : UInt8, *, iupac : Bool = false, strict : Bool = false) : UInt8
     # Check standard bases first
     if standard_base = normalize_standard_base(c)
       return standard_base
@@ -62,7 +62,7 @@ module Fastx
     end
 
     # Convert unknown characters to N
-    replace_with_n(c)
+    replace_with_n(c, strict: strict)
   end
 
   # Private method to normalize standard bases (A, C, G, T, N)
@@ -97,8 +97,8 @@ module Fastx
   end
 
   # Private method to replace unknown characters with N and log the replacement
-  private def self.replace_with_n(c : UInt8) : UInt8
-    STDERR.puts "'#{c.chr}' is replaced with 'N'"
+  private def self.replace_with_n(c : UInt8, *, strict : Bool) : UInt8
+    raise InvalidBaseError.new(c) if strict
     78u8 # N
   end
 
@@ -108,9 +108,9 @@ module Fastx
   # When iupac is false, only standard bases (A, C, G, T, N) are preserved.
   # Non-recognized characters are converted to N (78u8).
   # This representation is suitable for byte-wise or array processing.
-  def self.encode_bases(sequence : IO::Memory | String, *, iupac : Bool = false) : Slice(UInt8)
+  def self.encode_bases(sequence : IO::Memory | String, *, iupac : Bool = false, strict : Bool = false) : Slice(UInt8)
     sequence.to_slice.map do |c|
-      normalize_base(c, iupac: iupac)
+      normalize_base(c, iupac: iupac, strict: strict)
     end
   end
 

@@ -43,4 +43,23 @@ describe Fastx::Fasta::Writer do
     reader.close
     tempfile.delete
   end
+
+  it "should wrap fasta sequence lines when line_width is specified" do
+    tempfile = File.tempfile("wrapped.fa")
+    writer = Fastx::Fasta::Writer.new(tempfile.path, line_width: 4)
+    writer.write("chr1 1", "ACGTGG")
+    writer.close
+
+    File.read(tempfile.path).should eq(">chr1 1\nACGT\nGG\n")
+    tempfile.delete
+  end
+
+  it "should support writing to IO::Memory" do
+    io = IO::Memory.new
+    writer = Fastx::Fasta::Writer.new(io, line_width: 3)
+    writer.write("seq1", "ACGT")
+
+    io.to_s.should eq(">seq1\nACG\nT\n")
+    writer.close
+  end
 end

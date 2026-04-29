@@ -4,9 +4,10 @@ require "compress/gzip"
 module Fastx
   module Fasta
     class Reader
-      @filename : Path
-      @gzip : Bool
-      @file : File
+      @filename : Path?
+      @file : File?
+      @io : IO
+      @consumed = false
 
       # Opens a FASTA file, yields the reader to the block, and automatically closes it.
       def self.open(filename : String | Path, &)
@@ -16,80 +17,86 @@ module Fastx
         reader.try &.close
       end
 
+      # Opens a FASTA stream, yields the reader to the block, and automatically closes it.
+      def self.open(io : IO, &)
+        reader = self.new(io)
+        yield reader
+      ensure
+        reader.try &.close
+      end
+
       # Creates a new FASTA reader for the specified file.
       # Automatically detects gzip compression from .gz extension.
       def initialize(filename : String | Path)
         @filename = Path.new(filename)
-        @gzip = @filename.extension == ".gz"
-        @file = File.open(filename)
+        file = File.open(filename)
+        @file = file
+        @io = @filename.not_nil!.extension == ".gz" ? Compress::Gzip::Reader.new(file) : file
+      end
+
+      # Creates a new FASTA reader for an already opened IO stream.
+      # IO-based readers do not perform gzip auto-detection.
+      def initialize(io : IO)
+        @filename = nil
+        @file = nil
+        @io = io
       end
 
       # Iterates over each FASTA record, yielding name and sequence.
+      # This method reuses its internal sequence buffer until the next iteration.
       def each(&)
-        file = @gzip ? Compress::Gzip::Reader.new(@file) : @file
-        return if file.nil?
-
-        name = nil
-        sequence = IO::Memory.new
-
-        file.each_line do |line|
-          if line.starts_with?(">")
-            yield name, sequence unless name.nil?
-            # Remove ">" and newline but is it ok on Windows? CR+LF?
-            name = line[1..-1]
-            # Try to reuse sequence buffer to avoid memory allocation.
-            # But not clear if it's a good idea.
-            # Parhaps it's better to implement a copy mode as well.
-            sequence.clear
-          else
-            # Check for invalid characters
-            if !line.ascii_only?
-              raise InvalidCharacterError.new(@filename, name, sequence)
-            end
-            sequence << line
-          end
+        ensure_not_consumed!
+        each_record do |name, sequence|
+          yield name, sequence
         end
-        yield name, sequence unless name.nil?
-
-        file.close if file.is_a?(Compress::Gzip::Reader)
       end
 
       # Iterates over each FASTA record, yielding name and sequence as String copies.
-      # This avoids buffer reuse issues when references to sequence data are kept.
       def each_copy(&)
-        file = @gzip ? Compress::Gzip::Reader.new(@file) : @file
-        return if file.nil?
-
-        name = nil
-        sequence = IO::Memory.new
-
-        file.each_line do |line|
-          if line.starts_with?(">")
-            yield name, sequence.to_s unless name.nil?
-            # Remove ">" and newline but is it ok on Windows? CR+LF?
-            name = line[1..-1]
-            sequence.clear
-          else
-            # Check for invalid characters
-            if !line.ascii_only?
-              raise InvalidCharacterError.new(@filename, name, sequence)
-            end
-            sequence << line
-          end
+        ensure_not_consumed!
+        each_record do |name, sequence|
+          yield name, sequence.to_s
         end
-        yield name, sequence.to_s unless name.nil?
-
-        file.close if file.is_a?(Compress::Gzip::Reader)
       end
 
       # Closes the file handle.
       def close
-        @file.close
+        @io.close unless @io.closed?
+
+        file = @file
+        file.close if file && !file.closed?
       end
 
       # Returns true if the file handle is closed.
       def closed?
-        @file.closed?
+        @io.closed?
+      end
+
+      private def ensure_not_consumed!
+        raise ReaderConsumedError.new if @consumed
+        @consumed = true
+      end
+
+      private def each_record(&)
+        name = nil
+        sequence = IO::Memory.new
+
+        @io.each_line do |line|
+          if line.starts_with?(">")
+            yield name, sequence unless name.nil?
+            name = line[1..-1]
+            sequence.clear
+          else
+            raise InvalidCharacterError.new(source_label, name, line) unless line.ascii_only?
+            sequence << line
+          end
+        end
+
+        yield name, sequence unless name.nil?
+      end
+
+      private def source_label
+        @filename ? @filename.to_s : "<io>"
       end
     end
   end
