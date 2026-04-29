@@ -10,7 +10,7 @@ module Fastx
 
       # Opens a FASTA file for writing, yields the writer to the block, and automatically closes it.
       def self.open(filename : String | Path, line_width : Int32? = nil, &)
-        writer = self.new(filename, line_width: line_width)
+        writer = new(filename, line_width: line_width)
         yield writer
       ensure
         writer.try &.close
@@ -18,7 +18,7 @@ module Fastx
 
       # Opens a FASTA stream for writing, yields the writer to the block, and automatically closes it.
       def self.open(io : IO, line_width : Int32? = nil, &)
-        writer = self.new(io, line_width: line_width)
+        writer = new(io, line_width: line_width)
         yield writer
       ensure
         writer.try &.close
@@ -75,7 +75,7 @@ module Fastx
       end
 
       private def normalize_line_width(line_width : Int32?) : Int32?
-        return nil if line_width.nil?
+        return if line_width.nil?
         raise ArgumentError.new("line_width must be positive") if line_width <= 0
         line_width
       end

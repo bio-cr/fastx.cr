@@ -11,7 +11,7 @@ module Fastx
 
       # Opens a FASTQ file, yields the reader to the block, and automatically closes it.
       def self.open(filename : String | Path, &)
-        reader = self.new(filename)
+        reader = new(filename)
         yield reader
       ensure
         reader.try &.close
@@ -19,7 +19,7 @@ module Fastx
 
       # Opens a FASTQ stream, yields the reader to the block, and automatically closes it.
       def self.open(io : IO, &)
-        reader = self.new(io)
+        reader = new(io)
         yield reader
       ensure
         reader.try &.close
@@ -28,10 +28,11 @@ module Fastx
       # Creates a new FASTQ reader for the specified file.
       # Automatically detects gzip compression from .gz extension.
       def initialize(filename : String | Path)
-        @filename = Path.new(filename)
+        path = Path.new(filename)
+        @filename = path
         file = File.open(filename)
         @file = file
-        @io = @filename.not_nil!.extension == ".gz" ? Compress::Gzip::Reader.new(file) : file
+        @io = path.extension == ".gz" ? Compress::Gzip::Reader.new(file) : file
       end
 
       # Creates a new FASTQ reader for an already opened IO stream.

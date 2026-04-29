@@ -7,23 +7,13 @@ module Fastx
 
   class InvalidCharacterError < FastxError
     def initialize(filename, name, sequence)
-      msg = <<-ERROR
-      Non-ASCII characters in FASTA file: #{filename}
-        #{name}
-        #{sequence}
-      ERROR
-      super(msg)
+      super("Non-ASCII characters in FASTA file: #{filename}\n  #{name}\n  #{sequence}")
     end
   end
 
   class InvalidFormatError < FastxError
     def initialize(filename, idx, line, message = nil)
-      msg = <<-ERROR
-      Invalid Format: #{filename}:#{idx}
-        #{line}
-      #{message}
-      ERROR
-      super(msg)
+      super("Invalid Format: #{filename}:#{idx}\n  #{line}\n#{message}")
     end
   end
 

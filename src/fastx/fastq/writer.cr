@@ -9,7 +9,7 @@ module Fastx
 
       # Opens a FASTQ file for writing, yields the writer to the block, and automatically closes it.
       def self.open(filename : String | Path, &)
-        writer = self.new(filename)
+        writer = new(filename)
         yield writer
       ensure
         writer.try &.close
@@ -17,7 +17,7 @@ module Fastx
 
       # Opens a FASTQ stream for writing, yields the writer to the block, and automatically closes it.
       def self.open(io : IO, &)
-        writer = self.new(io)
+        writer = new(io)
         yield writer
       ensure
         writer.try &.close

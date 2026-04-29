@@ -39,7 +39,7 @@ describe Fastx::Fastq::Reader do
 
     reader = Fastx::Fastq::Reader.new(tempfile.path)
     expect_raises(Fastx::InvalidFormatError) do
-      reader.each do |id, sequence, quality|
+      reader.each do |_, _, _|
         # This should raise an exception
       end
     end
@@ -53,7 +53,7 @@ describe Fastx::Fastq::Reader do
 
     reader = Fastx::Fastq::Reader.new(tempfile.path)
     expect_raises(Fastx::InvalidFormatError) do
-      reader.each do |id, sequence, quality|
+      reader.each do |_, _, _|
         # This should raise an exception
       end
     end
@@ -67,7 +67,7 @@ describe Fastx::Fastq::Reader do
 
     reader = Fastx::Fastq::Reader.new(tempfile.path)
     expect_raises(Fastx::InvalidCharacterError) do
-      reader.each do |id, sequence, quality|
+      reader.each do |_, _, _|
         # This should raise an exception
       end
     end
@@ -81,7 +81,7 @@ describe Fastx::Fastq::Reader do
 
     reader = Fastx::Fastq::Reader.new(tempfile.path)
     expect_raises(Fastx::InvalidCharacterError) do
-      reader.each do |id, sequence, quality|
+      reader.each do |_, _, _|
         # This should raise an exception
       end
     end
@@ -95,7 +95,7 @@ describe Fastx::Fastq::Reader do
 
     reader = Fastx::Fastq::Reader.new(tempfile.path)
     expect_raises(Fastx::InvalidFormatError, /sequence and quality lengths differ/) do
-      reader.each do |id, sequence, quality|
+      reader.each do |_, _, _|
       end
     end
     reader.close
@@ -108,7 +108,7 @@ describe Fastx::Fastq::Reader do
 
     reader = Fastx::Fastq::Reader.new(tempfile.path)
     expect_raises(Fastx::InvalidFormatError, /Incomplete FASTQ record/) do
-      reader.each do |id, sequence, quality|
+      reader.each do |_, _, _|
       end
     end
     reader.close
@@ -153,7 +153,7 @@ describe Fastx::Fastq::Reader do
 
     reader = Fastx::Fastq::Reader.new(tempfile.path)
     expect_raises(Fastx::InvalidFormatError) do
-      reader.each_copy do |id, sequence, quality|
+      reader.each_copy do |_, _, _|
         # This should raise an exception
       end
     end
@@ -167,7 +167,7 @@ describe Fastx::Fastq::Reader do
 
     reader = Fastx::Fastq::Reader.new(tempfile.path)
     expect_raises(Fastx::InvalidFormatError) do
-      reader.each_copy do |id, sequence, quality|
+      reader.each_copy do |_, _, _|
         # This should raise an exception
       end
     end
@@ -181,7 +181,7 @@ describe Fastx::Fastq::Reader do
 
     reader = Fastx::Fastq::Reader.new(tempfile.path)
     expect_raises(Fastx::InvalidCharacterError) do
-      reader.each_copy do |id, sequence, quality|
+      reader.each_copy do |_, _, _|
         # This should raise an exception
       end
     end
@@ -195,7 +195,7 @@ describe Fastx::Fastq::Reader do
 
     reader = Fastx::Fastq::Reader.new(tempfile.path)
     expect_raises(Fastx::InvalidCharacterError) do
-      reader.each_copy do |id, sequence, quality|
+      reader.each_copy do |_, _, _|
         # This should raise an exception
       end
     end
@@ -230,16 +230,16 @@ describe Fastx::Fastq::Reader do
       records << {id, sequence, quality}
     end
 
-    records.should eq([{ "test", "ACGT", "!!!!" }])
+    records.should eq([{"test", "ACGT", "!!!!"}])
     reader.close
   end
 
   it "should be one-pass" do
     reader = Fastx::Fastq::Reader.new(Path[__DIR__, "fixtures/moo.fq"])
-    reader.each { |id, sequence, quality| }
+    reader.each { |_, _, _| }
 
     expect_raises(Fastx::ReaderConsumedError) do
-      reader.each { |id, sequence, quality| }
+      reader.each { |_, _, _| }
     end
 
     reader.close

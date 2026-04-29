@@ -7,40 +7,32 @@ module Fastx
   # Opens a FASTA/FASTQ file with automatic format detection or explicit format.
   # Yields the appropriate Reader/Writer to the block and automatically closes it.
   def self.open(filename : Path | String, mode = "r", format : Format? = nil, &) # block given
-    case format
-    when Format::FASTQ
-      Fastq.open(filename, mode) { |f| yield f }
-    when Format::FASTA
-      Fasta.open(filename, mode) { |f| yield f }
+    return Fastq.open(filename, mode) { |reader_or_writer| yield reader_or_writer } if format == Format::FASTQ
+    return Fasta.open(filename, mode) { |reader_or_writer| yield reader_or_writer } if format == Format::FASTA
+
+    case filename.to_s
+    when /\.fastq$/, /\.fq$/, /\.fastq.gz$/, /\.fq.gz$/
+      Fastq.open(filename, mode) { |reader_or_writer| yield reader_or_writer }
+    when /\.fasta$/, /\.fa$/, /\.fasta.gz$/, /\.fa.gz$/
+      Fasta.open(filename, mode) { |reader_or_writer| yield reader_or_writer }
     else
-      case filename.to_s
-      when /\.fastq$/, /\.fq$/, /\.fastq.gz$/, /\.fq.gz$/
-        Fastq.open(filename, mode) { |f| yield f }
-      when /\.fasta$/, /\.fa$/, /\.fasta.gz$/, /\.fa.gz$/
-        Fasta.open(filename, mode) { |f| yield f }
-      else
-        raise UnsupportedFormatError.new("Unknown format: #{filename}")
-      end
+      raise UnsupportedFormatError.new("Unknown format: #{filename}")
     end
   end
 
   # Opens a FASTA/FASTQ file with automatic format detection or explicit format.
   # Returns the appropriate Reader/Writer instance (manual close required).
   def self.open(filename : Path | String, mode = "r", format : Format? = nil)
-    case format
-    when Format::FASTQ
+    return Fastq.open(filename, mode) if format == Format::FASTQ
+    return Fasta.open(filename, mode) if format == Format::FASTA
+
+    case filename.to_s
+    when /\.fastq$/, /\.fq$/, /\.fastq.gz$/, /\.fq.gz$/
       Fastq.open(filename, mode)
-    when Format::FASTA
+    when /\.fasta$/, /\.fa$/, /\.fasta.gz$/, /\.fa.gz$/
       Fasta.open(filename, mode)
     else
-      case filename.to_s
-      when /\.fastq$/, /\.fq$/, /\.fastq.gz$/, /\.fq.gz$/
-        Fastq.open(filename, mode)
-      when /\.fasta$/, /\.fa$/, /\.fasta.gz$/, /\.fa.gz$/
-        Fasta.open(filename, mode)
-      else
-        raise UnsupportedFormatError.new("Unknown format: #{filename}")
-      end
+      raise UnsupportedFormatError.new("Unknown format: #{filename}")
     end
   end
 
@@ -73,8 +65,6 @@ module Fastx
     when 71u8, 103u8 then 71u8 # G
     when 84u8, 116u8 then 84u8 # T
     when 78u8, 110u8 then 78u8 # N
-    else
-      nil
     end
   end
 
@@ -91,8 +81,6 @@ module Fastx
     when 68u8, 100u8 then 68u8 # D (A or G or T)
     when 72u8, 104u8 then 72u8 # H (A or C or T)
     when 86u8, 118u8 then 86u8 # V (A or C or G)
-    else
-      nil
     end
   end
 
@@ -109,8 +97,8 @@ module Fastx
   # Non-recognized characters are converted to N (78u8).
   # This representation is suitable for byte-wise or array processing.
   def self.encode_bases(sequence : IO::Memory | String, *, iupac : Bool = false, strict : Bool = false) : Slice(UInt8)
-    sequence.to_slice.map do |c|
-      normalize_base(c, iupac: iupac, strict: strict)
+    sequence.to_slice.map do |byte|
+      normalize_base(byte, iupac: iupac, strict: strict)
     end
   end
 

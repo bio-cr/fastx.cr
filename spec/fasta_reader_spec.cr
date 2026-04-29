@@ -53,7 +53,7 @@ describe Fastx::Fasta::Reader do
 
     reader = Fastx::Fasta::Reader.new(tempfile.path)
     expect_raises(Fastx::InvalidCharacterError) do
-      reader.each do |name, sequence|
+      reader.each do |_, _|
         # This should raise an exception
       end
     end
@@ -95,7 +95,7 @@ describe Fastx::Fasta::Reader do
 
     reader = Fastx::Fasta::Reader.new(tempfile.path)
     expect_raises(Fastx::InvalidCharacterError) do
-      reader.each_copy do |name, sequence|
+      reader.each_copy do |_, _|
         # This should raise an exception
       end
     end
@@ -112,16 +112,16 @@ describe Fastx::Fasta::Reader do
       records << {name, sequence}
     end
 
-    records.should eq([{ "seq1", "ACGT" }, { "seq2", "TT" }])
+    records.should eq([{"seq1", "ACGT"}, {"seq2", "TT"}])
     reader.close
   end
 
   it "should be one-pass" do
     reader = Fastx::Fasta::Reader.new(Path[__DIR__, "fixtures/moo.fa"])
-    reader.each { |name, sequence| }
+    reader.each { |_, _| }
 
     expect_raises(Fastx::ReaderConsumedError) do
-      reader.each { |name, sequence| }
+      reader.each { |_, _| }
     end
 
     reader.close
