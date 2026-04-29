@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Crystal Docs 1.17.1">
+<meta name="generator" content="Crystal Docs 1.19.1">
 <meta name="crystal_docs.project_version" content="main">
 <meta name="crystal_docs.project_name" content="fastx">
 
@@ -62,6 +62,11 @@
       
         <ul>
   
+  <li class=" " data-id="fastx/Fastx/Error" data-name="fastx::error">
+      <a href="Fastx/Error.html">Error</a>
+      
+    </li>
+  
   <li class="parent " data-id="fastx/Fastx/Fasta" data-name="fastx::fasta">
       <a href="Fastx/Fasta.html">Fasta</a>
       
@@ -117,6 +122,11 @@
       
     </li>
   
+  <li class=" " data-id="fastx/Fastx/InvalidBaseError" data-name="fastx::invalidbaseerror">
+      <a href="Fastx/InvalidBaseError.html">InvalidBaseError</a>
+      
+    </li>
+  
   <li class=" " data-id="fastx/Fastx/InvalidCharacterError" data-name="fastx::invalidcharactererror">
       <a href="Fastx/InvalidCharacterError.html">InvalidCharacterError</a>
       
@@ -124,6 +134,16 @@
   
   <li class=" " data-id="fastx/Fastx/InvalidFormatError" data-name="fastx::invalidformaterror">
       <a href="Fastx/InvalidFormatError.html">InvalidFormatError</a>
+      
+    </li>
+  
+  <li class=" " data-id="fastx/Fastx/ReaderConsumedError" data-name="fastx::readerconsumederror">
+      <a href="Fastx/ReaderConsumedError.html">ReaderConsumedError</a>
+      
+    </li>
+  
+  <li class=" " data-id="fastx/Fastx/UnsupportedFormatError" data-name="fastx::unsupportedformaterror">
+      <a href="Fastx/UnsupportedFormatError.html">UnsupportedFormatError</a>
       
     </li>
   
@@ -145,221 +165,156 @@
 </a>Fastx.cr</h1>
 <p><a href="https://github.com/bio-cr/fastx.cr/actions/workflows/ci.yml"><img src="https://github.com/bio-cr/fastx.cr/actions/workflows/ci.yml/badge.svg" alt="test" /></a>
 <a href="https://bio-cr.github.io/fastx.cr/"><img src="https://img.shields.io/badge/docs-latest-blue.svg" alt="Docs Latest" /></a></p>
-<p>A Crystal library for reading and writing FASTA and FASTQ files.</p>
+<p>Small FASTA/FASTQ I/O for Crystal.</p>
 <h2><a id="installation" class="anchor" href="#installation">
   <svg class="octicon-link" aria-hidden="true">
     <use href="#octicon-link"/>
   </svg>
 </a>Installation</h2>
-<ol>
-<li>
-<p>Add the dependency to your <code>shard.yml</code>:</p>
+<p>Add this to <code>shard.yml</code>:</p>
 <pre><code class="language-yaml">dependencies:
   fastx:
-    github: bio-cr/fastx.c</code></pre>
-</li>
-<li>
-<p>Run <code>shards install</code></p>
-</li>
-</ol>
-<h2><a id="usage" class="anchor" href="#usage">
+    github: bio-cr/fastx.cr</code></pre>
+<p>Then run:</p>
+<pre><code class="language-sh">shards install</code></pre>
+<h2><a id="what-it-does" class="anchor" href="#what-it-does">
   <svg class="octicon-link" aria-hidden="true">
     <use href="#octicon-link"/>
   </svg>
-</a>Usage</h2>
-<h3><a id="reading-fasta-files" class="anchor" href="#reading-fasta-files">
+</a>What It Does</h2>
+<ul>
+<li>Read FASTA</li>
+<li>Read FASTQ</li>
+<li>Write FASTA</li>
+<li>Write FASTQ</li>
+<li>Auto-handle gzip when the path ends with <code>.gz</code></li>
+<li>Stream large files with low-allocation readers</li>
+</ul>
+<h2><a id="read-fasta" class="anchor" href="#read-fasta">
   <svg class="octicon-link" aria-hidden="true">
     <use href="#octicon-link"/>
   </svg>
-</a>Reading FASTA files</h3>
+</a>Read FASTA</h2>
 <pre><code class="language-crystal"><span class="k">require</span> <span class="s">&quot;fastx&quot;</span>
 
-<span class="c"># Using Reader directly</span>
-reader <span class="o">=</span> <span class="t">Fastx</span><span class="t">::</span><span class="t">Fasta</span><span class="t">::</span><span class="t">Reader</span>.new(<span class="s">&quot;file.fa&quot;</span>)
-reader.each <span class="k">do</span> <span class="o">|</span>name, sequence<span class="o">|</span>
-  puts <span class="s">&quot;Name: </span><span class="i">#{</span>name<span class="i">}</span><span class="s">&quot;</span>
-  puts <span class="s">&quot;Sequence: </span><span class="i">#{</span>sequence.to_s<span class="i">}</span><span class="s">&quot;</span>
-<span class="k">end</span>
-reader.close
-
-<span class="c"># Using block (automatically closes)</span>
-<span class="t">Fastx</span><span class="t">::</span><span class="t">Fasta</span><span class="t">::</span><span class="t">Reader</span>.open(<span class="s">&quot;file.fa&quot;</span>) <span class="k">do</span> <span class="o">|</span>reader<span class="o">|</span>
-  reader.each <span class="k">do</span> <span class="o">|</span>name, sequence<span class="o">|</span>
-    puts <span class="s">&quot;Name: </span><span class="i">#{</span>name<span class="i">}</span><span class="s">&quot;</span>
-    puts <span class="s">&quot;Sequence: </span><span class="i">#{</span>sequence.to_s<span class="i">}</span><span class="s">&quot;</span>
-  <span class="k">end</span>
-<span class="k">end</span>
-
-<span class="c"># Using each_copy for String copies (avoids buffer reuse issues)</span>
-<span class="t">Fastx</span><span class="t">::</span><span class="t">Fasta</span><span class="t">::</span><span class="t">Reader</span>.open(<span class="s">&quot;file.fa&quot;</span>) <span class="k">do</span> <span class="o">|</span>reader<span class="o">|</span>
-  reader.each_copy <span class="k">do</span> <span class="o">|</span>name, sequence<span class="o">|</span>
-    puts <span class="s">&quot;Name: </span><span class="i">#{</span>name<span class="i">}</span><span class="s">&quot;</span>
-    puts <span class="s">&quot;Sequence: </span><span class="i">#{</span>sequence<span class="i">}</span><span class="s">&quot;</span> <span class="c"># sequence is already a String</span>
+<span class="t">Fastx</span><span class="t">::</span><span class="t">Fasta</span><span class="t">::</span><span class="t">Reader</span>.open(<span class="s">&quot;reads.fa.gz&quot;</span>) <span class="k">do</span> <span class="o">|</span>reader<span class="o">|</span>
+  reader.each <span class="k">do</span> <span class="o">|</span>header, sequence<span class="o">|</span>
+    puts <span class="s">&quot;</span><span class="i">#{</span>header<span class="i">}</span><span class="s">\t</span><span class="i">#{</span>sequence.bytesize<span class="i">}</span><span class="s">&quot;</span>
   <span class="k">end</span>
 <span class="k">end</span></code></pre>
-<h3><a id="reading-fastq-files" class="anchor" href="#reading-fastq-files">
+<p>Use <code>#each_copy</code> if you need to keep records after the current iteration:</p>
+<pre><code class="language-crystal"><span class="t">Fastx</span><span class="t">::</span><span class="t">Fasta</span><span class="t">::</span><span class="t">Reader</span>.open(<span class="s">&quot;reads.fa&quot;</span>) <span class="k">do</span> <span class="o">|</span>reader<span class="o">|</span>
+  reader.each_copy <span class="k">do</span> <span class="o">|</span>header, sequence<span class="o">|</span>
+    stored_header <span class="o">=</span> header
+    stored_sequence <span class="o">=</span> sequence
+  <span class="k">end</span>
+<span class="k">end</span></code></pre>
+<h2><a id="read-fastq" class="anchor" href="#read-fastq">
   <svg class="octicon-link" aria-hidden="true">
     <use href="#octicon-link"/>
   </svg>
-</a>Reading FASTQ files</h3>
-<pre><code class="language-crystal"><span class="c"># Using Reader directly</span>
-reader <span class="o">=</span> <span class="t">Fastx</span><span class="t">::</span><span class="t">Fastq</span><span class="t">::</span><span class="t">Reader</span>.new(<span class="s">&quot;file.fq&quot;</span>)
-reader.each <span class="k">do</span> <span class="o">|</span>identifier, sequence, quality<span class="o">|</span>
-  puts <span class="s">&quot;ID: </span><span class="i">#{</span>identifier<span class="i">}</span><span class="s">&quot;</span>
-  puts <span class="s">&quot;Sequence: </span><span class="i">#{</span>sequence.to_s<span class="i">}</span><span class="s">&quot;</span>
-  puts <span class="s">&quot;Quality: </span><span class="i">#{</span>quality.to_s<span class="i">}</span><span class="s">&quot;</span>
-<span class="k">end</span>
-reader.close
-
-<span class="c"># Using block (automatically closes)</span>
-<span class="t">Fastx</span><span class="t">::</span><span class="t">Fastq</span><span class="t">::</span><span class="t">Reader</span>.open(<span class="s">&quot;file.fq&quot;</span>) <span class="k">do</span> <span class="o">|</span>reader<span class="o">|</span>
+</a>Read FASTQ</h2>
+<pre><code class="language-crystal"><span class="t">Fastx</span><span class="t">::</span><span class="t">Fastq</span><span class="t">::</span><span class="t">Reader</span>.open(<span class="s">&quot;reads.fq.gz&quot;</span>) <span class="k">do</span> <span class="o">|</span>reader<span class="o">|</span>
   reader.each <span class="k">do</span> <span class="o">|</span>identifier, sequence, quality<span class="o">|</span>
-    puts <span class="s">&quot;ID: </span><span class="i">#{</span>identifier<span class="i">}</span><span class="s">&quot;</span>
-    puts <span class="s">&quot;Sequence: </span><span class="i">#{</span>sequence.to_s<span class="i">}</span><span class="s">&quot;</span>
-    puts <span class="s">&quot;Quality: </span><span class="i">#{</span>quality.to_s<span class="i">}</span><span class="s">&quot;</span>
+    puts <span class="s">&quot;</span><span class="i">#{</span>identifier<span class="i">}</span><span class="s">\t</span><span class="i">#{</span>sequence.bytesize<span class="i">}</span><span class="s">\t</span><span class="i">#{</span>quality.bytesize<span class="i">}</span><span class="s">&quot;</span>
   <span class="k">end</span>
-<span class="k">end</span>
-
-<span class="c"># Using each_copy for String copies (avoids buffer reuse issues)</span>
-<span class="t">Fastx</span><span class="t">::</span><span class="t">Fastq</span><span class="t">::</span><span class="t">Reader</span>.open(<span class="s">&quot;file.fq&quot;</span>) <span class="k">do</span> <span class="o">|</span>reader<span class="o">|</span>
+<span class="k">end</span></code></pre>
+<p>Use <code>#each_copy</code> if you need safe <code>String</code> copies:</p>
+<pre><code class="language-crystal"><span class="t">Fastx</span><span class="t">::</span><span class="t">Fastq</span><span class="t">::</span><span class="t">Reader</span>.open(<span class="s">&quot;reads.fq&quot;</span>) <span class="k">do</span> <span class="o">|</span>reader<span class="o">|</span>
   reader.each_copy <span class="k">do</span> <span class="o">|</span>identifier, sequence, quality<span class="o">|</span>
-    puts <span class="s">&quot;ID: </span><span class="i">#{</span>identifier<span class="i">}</span><span class="s">&quot;</span>
-    puts <span class="s">&quot;Sequence: </span><span class="i">#{</span>sequence<span class="i">}</span><span class="s">&quot;</span> <span class="c"># sequence is already a String</span>
-    puts <span class="s">&quot;Quality: </span><span class="i">#{</span>quality<span class="i">}</span><span class="s">&quot;</span>   <span class="c"># quality is already a String</span>
+    saved_id <span class="o">=</span> identifier
+    saved_sequence <span class="o">=</span> sequence
+    saved_quality <span class="o">=</span> quality
   <span class="k">end</span>
 <span class="k">end</span></code></pre>
-<h3><a id="writing-fasta-files" class="anchor" href="#writing-fasta-files">
+<h2><a id="write-fasta" class="anchor" href="#write-fasta">
   <svg class="octicon-link" aria-hidden="true">
     <use href="#octicon-link"/>
   </svg>
-</a>Writing FASTA files</h3>
-<pre><code class="language-crystal"><span class="c"># Using Writer directly</span>
-writer <span class="o">=</span> <span class="t">Fastx</span><span class="t">::</span><span class="t">Fasta</span><span class="t">::</span><span class="t">Writer</span>.new(<span class="s">&quot;output.fa&quot;</span>)
-writer.write(<span class="s">&quot;seq1&quot;</span>, <span class="s">&quot;ACGTACGT&quot;</span>)
-writer.write(<span class="s">&quot;seq2&quot;</span>, <span class="s">&quot;TGCATGCA&quot;</span>)
-writer.close
-
-<span class="c"># Using block (automatically closes)</span>
-<span class="t">Fastx</span><span class="t">::</span><span class="t">Fasta</span><span class="t">::</span><span class="t">Writer</span>.open(<span class="s">&quot;output.fa&quot;</span>) <span class="k">do</span> <span class="o">|</span>writer<span class="o">|</span>
+</a>Write FASTA</h2>
+<pre><code class="language-crystal"><span class="t">Fastx</span><span class="t">::</span><span class="t">Fasta</span><span class="t">::</span><span class="t">Writer</span>.open(<span class="s">&quot;out.fa&quot;</span>, line_width: <span class="n">80</span>) <span class="k">do</span> <span class="o">|</span>writer<span class="o">|</span>
   writer.write(<span class="s">&quot;seq1&quot;</span>, <span class="s">&quot;ACGTACGT&quot;</span>)
-  writer.write(<span class="s">&quot;seq2&quot;</span>, <span class="s">&quot;TGCATGCA&quot;</span>)
+  writer.write(<span class="s">&quot;seq2&quot;</span>, <span class="s">&quot;TTTTCCCC&quot;</span>)
 <span class="k">end</span></code></pre>
-<h3><a id="writing-fastq-files" class="anchor" href="#writing-fastq-files">
+<p>Set <code>line_width: nil</code> to write one sequence line per record.</p>
+<h2><a id="write-fastq" class="anchor" href="#write-fastq">
   <svg class="octicon-link" aria-hidden="true">
     <use href="#octicon-link"/>
   </svg>
-</a>Writing FASTQ files</h3>
-<pre><code class="language-crystal"><span class="c"># Using Writer directly</span>
-writer <span class="o">=</span> <span class="t">Fastx</span><span class="t">::</span><span class="t">Fastq</span><span class="t">::</span><span class="t">Writer</span>.new(<span class="s">&quot;output.fq&quot;</span>)
-writer.write(<span class="s">&quot;seq1&quot;</span>, <span class="s">&quot;ACGTACGT&quot;</span>, <span class="s">&quot;!!!!!!!!&quot;</span>)
-writer.write(<span class="s">&quot;seq2&quot;</span>, <span class="s">&quot;TGCATGCA&quot;</span>, <span class="s">&quot;~~~~~~~~&quot;</span>)
-writer.close
-
-<span class="c"># Using block (automatically closes)</span>
-<span class="t">Fastx</span><span class="t">::</span><span class="t">Fastq</span><span class="t">::</span><span class="t">Writer</span>.open(<span class="s">&quot;output.fq&quot;</span>) <span class="k">do</span> <span class="o">|</span>writer<span class="o">|</span>
-  writer.write(<span class="s">&quot;seq1&quot;</span>, <span class="s">&quot;ACGTACGT&quot;</span>, <span class="s">&quot;!!!!!!!!&quot;</span>)
-  writer.write(<span class="s">&quot;seq2&quot;</span>, <span class="s">&quot;TGCATGCA&quot;</span>, <span class="s">&quot;~~~~~~~~&quot;</span>)
+</a>Write FASTQ</h2>
+<pre><code class="language-crystal"><span class="t">Fastx</span><span class="t">::</span><span class="t">Fastq</span><span class="t">::</span><span class="t">Writer</span>.open(<span class="s">&quot;out.fq.gz&quot;</span>) <span class="k">do</span> <span class="o">|</span>writer<span class="o">|</span>
+  writer.write(<span class="s">&quot;seq1&quot;</span>, <span class="s">&quot;ACGT&quot;</span>, <span class="s">&quot;!!!!&quot;</span>)
+  writer.write(<span class="s">&quot;seq2&quot;</span>, <span class="s">&quot;TTTT&quot;</span>, <span class="s">&quot;####&quot;</span>)
 <span class="k">end</span></code></pre>
-<details>
-<summary>Format detection and specification</summary>
-<h3><a id="format-detection-by-file-extension" class="anchor" href="#format-detection-by-file-extension">
+<p><code><a href="Fastx/Fastq/Writer.html">Fastx::Fastq::Writer</a></code> raises <code>ArgumentError</code> if sequence and quality lengths differ.</p>
+<h2><a id="use-existing-io" class="anchor" href="#use-existing-io">
   <svg class="octicon-link" aria-hidden="true">
     <use href="#octicon-link"/>
   </svg>
-</a>Format detection by file extension</h3>
-<pre><code class="language-crystal"><span class="c"># Format is inferred from file extension, but type casting is still required</span>
-<span class="t">Fastx</span>.open(<span class="s">&quot;file.fa&quot;</span>) <span class="k">do</span> <span class="o">|</span>reader<span class="o">|</span>
-  reader.<span class="k">as</span>(<span class="t">Fastx</span><span class="t">::</span><span class="t">Fasta</span><span class="t">::</span><span class="t">Reader</span>).each <span class="k">do</span> <span class="o">|</span>name, sequence<span class="o">|</span>
-    puts <span class="s">&quot;</span><span class="i">#{</span>name<span class="i">}</span><span class="s">: </span><span class="i">#{</span>sequence.to_s<span class="i">}</span><span class="s">&quot;</span>
-  <span class="k">end</span>
-<span class="k">end</span>
+</a>Use Existing IO</h2>
+<p>Path-based APIs auto-detect gzip from the filename. IO-based APIs do not.</p>
+<pre><code class="language-crystal">io <span class="o">=</span> <span class="t">IO</span><span class="t">::</span><span class="t">Memory</span>.new(<span class="s">&quot;@seq1\nACGT\n+\n!!!!\n&quot;</span>)
+reader <span class="o">=</span> <span class="t">Fastx</span><span class="t">::</span><span class="t">Fastq</span><span class="t">::</span><span class="t">Reader</span>.new(io)
 
-<span class="t">Fastx</span>.open(<span class="s">&quot;file.fq&quot;</span>) <span class="k">do</span> <span class="o">|</span>reader<span class="o">|</span>
-  reader.<span class="k">as</span>(<span class="t">Fastx</span><span class="t">::</span><span class="t">Fastq</span><span class="t">::</span><span class="t">Reader</span>).each <span class="k">do</span> <span class="o">|</span>id, sequence, quality<span class="o">|</span>
-    puts <span class="s">&quot;</span><span class="i">#{</span>id<span class="i">}</span><span class="s">: </span><span class="i">#{</span>sequence.to_s<span class="i">}</span><span class="s">&quot;</span>
-  <span class="k">end</span>
+reader.each_copy <span class="k">do</span> <span class="o">|</span>identifier, sequence, quality<span class="o">|</span>
+  puts <span class="s">&quot;</span><span class="i">#{</span>identifier<span class="i">}</span><span class="s">\t</span><span class="i">#{</span>sequence<span class="i">}</span><span class="s">\t</span><span class="i">#{</span>quality<span class="i">}</span><span class="s">&quot;</span>
 <span class="k">end</span></code></pre>
-<h3><a id="explicit-format-specification" class="anchor" href="#explicit-format-specification">
+<pre><code class="language-crystal">io <span class="o">=</span> <span class="t">IO</span><span class="t">::</span><span class="t">Memory</span>.new
+writer <span class="o">=</span> <span class="t">Fastx</span><span class="t">::</span><span class="t">Fasta</span><span class="t">::</span><span class="t">Writer</span>.new(io, line_width: <span class="n">4</span>)
+writer.write(<span class="s">&quot;seq1&quot;</span>, <span class="s">&quot;ACGTGG&quot;</span>)
+puts io.to_s</code></pre>
+<h2><a id="format-detection" class="anchor" href="#format-detection">
   <svg class="octicon-link" aria-hidden="true">
     <use href="#octicon-link"/>
   </svg>
-</a>Explicit format specification</h3>
-<pre><code class="language-crystal"><span class="c"># Using Format enum for explicit format specification</span>
-<span class="t">Fastx</span>.open(<span class="s">&quot;data&quot;</span>, <span class="s">&quot;r&quot;</span>, <span class="t">Fastx</span><span class="t">::</span><span class="t">Format</span><span class="t">::</span><span class="t">FASTA</span>) <span class="k">do</span> <span class="o">|</span>reader<span class="o">|</span>
-  reader.<span class="k">as</span>(<span class="t">Fastx</span><span class="t">::</span><span class="t">Fasta</span><span class="t">::</span><span class="t">Reader</span>).each <span class="k">do</span> <span class="o">|</span>name, sequence<span class="o">|</span>
-    puts <span class="s">&quot;</span><span class="i">#{</span>name<span class="i">}</span><span class="s">: </span><span class="i">#{</span>sequence.to_s<span class="i">}</span><span class="s">&quot;</span>
+</a>Format Detection</h2>
+<p><code>Fastx.open</code> is a convenience API based on file extension:</p>
+<pre><code class="language-crystal"><span class="t">Fastx</span>.open(<span class="s">&quot;reads.fa&quot;</span>) <span class="k">do</span> <span class="o">|</span>reader<span class="o">|</span>
+  reader.<span class="k">as</span>(<span class="t">Fastx</span><span class="t">::</span><span class="t">Fasta</span><span class="t">::</span><span class="t">Reader</span>).each <span class="k">do</span> <span class="o">|</span>header, sequence<span class="o">|</span>
+    puts <span class="s">&quot;</span><span class="i">#{</span>header<span class="i">}</span><span class="s">\t</span><span class="i">#{</span>sequence.bytesize<span class="i">}</span><span class="s">&quot;</span>
   <span class="k">end</span>
-<span class="k">end</span>
-
-<span class="t">Fastx</span>.open(<span class="s">&quot;output&quot;</span>, <span class="s">&quot;w&quot;</span>, <span class="t">Fastx</span><span class="t">::</span><span class="t">Format</span><span class="t">::</span><span class="t">FASTQ</span>) <span class="k">do</span> <span class="o">|</span>writer<span class="o">|</span>
+<span class="k">end</span></code></pre>
+<p>You can also pass the format explicitly:</p>
+<pre><code class="language-crystal"><span class="t">Fastx</span>.open(<span class="s">&quot;output&quot;</span>, <span class="s">&quot;w&quot;</span>, <span class="t">Fastx</span><span class="t">::</span><span class="t">Format</span><span class="t">::</span><span class="t">FASTQ</span>) <span class="k">do</span> <span class="o">|</span>writer<span class="o">|</span>
   writer.<span class="k">as</span>(<span class="t">Fastx</span><span class="t">::</span><span class="t">Fastq</span><span class="t">::</span><span class="t">Writer</span>).write(<span class="s">&quot;seq1&quot;</span>, <span class="s">&quot;ACGT&quot;</span>, <span class="s">&quot;!!!!&quot;</span>)
 <span class="k">end</span></code></pre>
-</details>
-<h3><a id="gzip-support" class="anchor" href="#gzip-support">
+<h2><a id="behavior-and-limits" class="anchor" href="#behavior-and-limits">
   <svg class="octicon-link" aria-hidden="true">
     <use href="#octicon-link"/>
   </svg>
-</a>Gzip support</h3>
-<p>Both reading and writing of gzip-compressed files are supported automatically when the filename ends with <code>.gz</code>.</p>
-<pre><code class="language-crystal"><span class="c"># Reads gzip-compressed FASTA</span>
-<span class="t">Fastx</span><span class="t">::</span><span class="t">Fasta</span><span class="t">::</span><span class="t">Reader</span>.open(<span class="s">&quot;file.fa.gz&quot;</span>) <span class="k">do</span> <span class="o">|</span>reader<span class="o">|</span>
-  reader.each <span class="k">do</span> <span class="o">|</span>name, sequence<span class="o">|</span>
-    puts <span class="s">&quot;</span><span class="i">#{</span>name<span class="i">}</span><span class="s">: </span><span class="i">#{</span>sequence.to_s<span class="i">}</span><span class="s">&quot;</span>
-  <span class="k">end</span>
-<span class="k">end</span>
-
-<span class="c"># Writes gzip-compressed FASTQ</span>
-<span class="t">Fastx</span><span class="t">::</span><span class="t">Fastq</span><span class="t">::</span><span class="t">Writer</span>.open(<span class="s">&quot;output.fq.gz&quot;</span>) <span class="k">do</span> <span class="o">|</span>writer<span class="o">|</span>
-  writer.write(<span class="s">&quot;seq1&quot;</span>, <span class="s">&quot;ACGT&quot;</span>, <span class="s">&quot;!!!!&quot;</span>)
-<span class="k">end</span></code></pre>
-<p>Note: Gzip refers to standard gzip, not BGZF (bgzip)</p>
-<h3><a id="base-encoding" class="anchor" href="#base-encoding">
+</a>Behavior And Limits</h2>
+<ul>
+<li><code>Reader#each</code> reuses internal buffers for performance.</li>
+<li>Values yielded by <code>#each</code> are only valid until the next iteration.</li>
+<li>Use <code>#each_copy</code> if you want values you can store safely.</li>
+<li>Readers are one-pass. Create a new reader to read again.</li>
+<li>Reader and writer instances are not thread-safe.</li>
+<li><code><a href="Fastx/Fastq/Reader.html">Fastx::Fastq::Reader</a></code> currently supports four-line FASTQ records only.</li>
+<li>Multi-line FASTQ is not supported.</li>
+<li>FASTQ reader and writer validate sequence/quality length equality.</li>
+</ul>
+<h2><a id="base-encoding" class="anchor" href="#base-encoding">
   <svg class="octicon-link" aria-hidden="true">
     <use href="#octicon-link"/>
   </svg>
-</a>Base encoding</h3>
-<p>Convert DNA sequences to UInt8 arrays suitable for byte-wise or array processing:</p>
-<pre><code class="language-crystal"><span class="c"># Encode bases to UInt8 array (A,C,G,T,N → 65,67,71,84,78; others → 78)</span>
-encoded <span class="o">=</span> <span class="t">Fastx</span>.encode_bases(<span class="s">&quot;AcGtNxyz&quot;</span>)
-<span class="c"># Returns: Slice[65u8, 67u8, 71u8, 84u8, 78u8, 78u8, 78u8, 78u8]</span>
-
-<span class="c"># Decode UInt8 array back to DNA string</span>
-decoded <span class="o">=</span> <span class="t">Fastx</span>.decode_bases(encoded)
-<span class="c"># Returns: &quot;ACGTNNNN&quot;</span></code></pre>
-<h3><a id="quality-encoding" class="anchor" href="#quality-encoding">
+</a>Base Encoding</h2>
+<pre><code class="language-crystal">encoded <span class="o">=</span> <span class="t">Fastx</span>.encode_bases(<span class="s">&quot;AcGtNxyz&quot;</span>)
+decoded <span class="o">=</span> <span class="t">Fastx</span>.decode_bases(encoded)</code></pre>
+<p>Unknown bases are normalized to <code>N</code> by default. Use <code>strict: true</code> to raise:</p>
+<pre><code class="language-crystal"><span class="t">Fastx</span>.normalize_base(<span class="s">&#39;X&#39;</span>.ord.to_u8, strict: <span class="n">true</span>)</code></pre>
+<h2><a id="quality-encoding" class="anchor" href="#quality-encoding">
   <svg class="octicon-link" aria-hidden="true">
     <use href="#octicon-link"/>
   </svg>
-</a>Quality encoding</h3>
-<p>Convert quality strings to Phred score arrays and back:</p>
-<pre><code class="language-crystal"><span class="c"># Encode quality string to Phred scores (Phred+33 by default)</span>
-phred_scores <span class="o">=</span> <span class="t">Fastx</span>.encode_phred(<span class="s">&quot;IIIIHGF&quot;</span>) <span class="c"># =&gt; [40_u8, 40_u8, 40_u8, 40_u8, 39_u8, 38_u8, 37_u8]</span>
-
-<span class="c"># Decode Phred scores to quality string</span>
-quality_str <span class="o">=</span> <span class="t">Fastx</span>.decode_phred([<span class="n">40_u8</span>, <span class="n">40_u8</span>, <span class="n">40_u8</span>, <span class="n">40_u8</span>, <span class="n">39_u8</span>, <span class="n">38_u8</span>, <span class="n">37_u8</span>]) <span class="c"># =&gt; &quot;IIIIHGF&quot;</span>
-
-<span class="c"># Specify offset for Phred+64</span>
-phred_scores64 <span class="o">=</span> <span class="t">Fastx</span>.encode_phred(<span class="s">&quot;dddd&quot;</span>, offset: <span class="n">64</span>)
-quality_str64 <span class="o">=</span> <span class="t">Fastx</span>.decode_phred([<span class="n">36_u8</span>, <span class="n">36_u8</span>, <span class="n">36_u8</span>, <span class="n">36_u8</span>], offset: <span class="n">64</span>)</code></pre>
-<h2><a id="contributing" class="anchor" href="#contributing">
-  <svg class="octicon-link" aria-hidden="true">
-    <use href="#octicon-link"/>
-  </svg>
-</a>Contributing</h2>
-<ol>
-<li>Fork it (<a href="https://github.com/bio-cr/fastx/fork">https://github.com/bio-cr/fastx/fork</a>)</li>
-<li>Create your feature branch (<code>git checkout -b my-new-feature</code>)</li>
-<li>Commit your changes (<code>git commit -am 'Add some feature'</code>)</li>
-<li>Push to the branch (<code>git push origin my-new-feature</code>)</li>
-<li>Create a new Pull Request</li>
-</ol>
+</a>Quality Encoding</h2>
+<pre><code class="language-crystal">scores <span class="o">=</span> <span class="t">Fastx</span>.encode_phred(<span class="s">&quot;IIIIHGF&quot;</span>)
+quality <span class="o">=</span> <span class="t">Fastx</span>.decode_phred(scores)</code></pre>
 <h2><a id="license" class="anchor" href="#license">
   <svg class="octicon-link" aria-hidden="true">
     <use href="#octicon-link"/>
   </svg>
 </a>License</h2>
 <p>MIT License</p>
-<p>This project includes code generated by AI.</p>
 </div>
 </body>
 </html>

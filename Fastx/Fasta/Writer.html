@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Crystal Docs 1.17.1">
+<meta name="generator" content="Crystal Docs 1.19.1">
 <meta name="crystal_docs.project_version" content="main">
 <meta name="crystal_docs.project_name" content="fastx">
 
@@ -62,6 +62,11 @@
       
         <ul>
   
+  <li class=" " data-id="fastx/Fastx/Error" data-name="fastx::error">
+      <a href="../../Fastx/Error.html">Error</a>
+      
+    </li>
+  
   <li class="parent open current" data-id="fastx/Fastx/Fasta" data-name="fastx::fasta">
       <a href="../../Fastx/Fasta.html">Fasta</a>
       
@@ -117,6 +122,11 @@
       
     </li>
   
+  <li class=" " data-id="fastx/Fastx/InvalidBaseError" data-name="fastx::invalidbaseerror">
+      <a href="../../Fastx/InvalidBaseError.html">InvalidBaseError</a>
+      
+    </li>
+  
   <li class=" " data-id="fastx/Fastx/InvalidCharacterError" data-name="fastx::invalidcharactererror">
       <a href="../../Fastx/InvalidCharacterError.html">InvalidCharacterError</a>
       
@@ -124,6 +134,16 @@
   
   <li class=" " data-id="fastx/Fastx/InvalidFormatError" data-name="fastx::invalidformaterror">
       <a href="../../Fastx/InvalidFormatError.html">InvalidFormatError</a>
+      
+    </li>
+  
+  <li class=" " data-id="fastx/Fastx/ReaderConsumedError" data-name="fastx::readerconsumederror">
+      <a href="../../Fastx/ReaderConsumedError.html">ReaderConsumedError</a>
+      
+    </li>
+  
+  <li class=" " data-id="fastx/Fastx/UnsupportedFormatError" data-name="fastx::unsupportedformaterror">
+      <a href="../../Fastx/UnsupportedFormatError.html">UnsupportedFormatError</a>
       
     </li>
   
@@ -178,7 +198,7 @@
   </h2>
   
     
-      <a href="https://github.com/bio-cr/fastx.cr/blob/b55af8a57c6e22b59820e23936f25b8c60c6025c/src/fastx/fasta/writer.cr#L6" target="_blank">
+      <a href="https://github.com/bio-cr/fastx.cr/blob/18ab4ffa9e3d7a7b620150e5f0301d156127561d/src/fastx/fasta/writer.cr#L6" target="_blank">
         fastx/fasta/writer.cr
       </a>
     
@@ -201,9 +221,16 @@
   <ul class="list-summary">
     
       <li class="entry-summary">
-        <a href="#new%28filename%3AString%7CPath%29-class-method" class="signature"><strong>.new</strong>(filename : String | Path)</a>
+        <a href="#new%28filename%3AString%7CPath%2Cline_width%3AInt32%7CNil%3Dnil%29-class-method" class="signature"><strong>.new</strong>(filename : String | Path, line_width : Int32 | Nil = <span class="n">nil</span>)</a>
         
           <div class="summary"><p>Creates a new FASTA writer for the specified file.</p></div>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#new%28io%3AIO%2Cline_width%3AInt32%7CNil%3Dnil%29-class-method" class="signature"><strong>.new</strong>(io : IO, line_width : Int32 | Nil = <span class="n">nil</span>)</a>
+        
+          <div class="summary"><p>Creates a new FASTA writer for an already opened IO stream.</p></div>
         
       </li>
     
@@ -222,9 +249,16 @@
   <ul class="list-summary">
     
       <li class="entry-summary">
-        <a href="#open%28filename%3AString%7CPath%2C%26%29-class-method" class="signature"><strong>.open</strong>(filename : String | Path, &)</a>
+        <a href="#open%28filename%3AString%7CPath%2Cline_width%3AInt32%7CNil%3Dnil%2C%26%29-class-method" class="signature"><strong>.open</strong>(filename : String | Path, line_width : Int32 | Nil = <span class="n">nil</span>, &)</a>
         
           <div class="summary"><p>Opens a FASTA file for writing, yields the writer to the block, and automatically closes it.</p></div>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#open%28io%3AIO%2Cline_width%3AInt32%7CNil%3Dnil%2C%26%29-class-method" class="signature"><strong>.open</strong>(io : IO, line_width : Int32 | Nil = <span class="n">nil</span>, &)</a>
+        
+          <div class="summary"><p>Opens a FASTA stream for writing, yields the writer to the block, and automatically closes it.</p></div>
         
       </li>
     
@@ -309,12 +343,12 @@
     Constructor Detail
   </h2>
   
-    <div class="entry-detail" id="new(filename:String|Path)-class-method">
+    <div class="entry-detail" id="new(filename:String|Path,line_width:Int32|Nil=nil)-class-method">
       <div class="signature">
         
-        def self.<strong>new</strong>(filename : String | Path)
+        def self.<strong>new</strong>(filename : String | Path, line_width : Int32 | Nil = <span class="n">nil</span>)
 
-        <a class="method-permalink" href="#new%28filename%3AString%7CPath%29-class-method">#</a>
+        <a class="method-permalink" href="#new%28filename%3AString%7CPath%2Cline_width%3AInt32%7CNil%3Dnil%29-class-method">#</a>
       </div>
       
         <div class="doc">
@@ -326,7 +360,29 @@ Automatically detects gzip compression from .gz extension.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/b55af8a57c6e22b59820e23936f25b8c60c6025c/src/fastx/fasta/writer.cr#L22" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/18ab4ffa9e3d7a7b620150e5f0301d156127561d/src/fastx/fasta/writer.cr#L29" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="new(io:IO,line_width:Int32|Nil=nil)-class-method">
+      <div class="signature">
+        
+        def self.<strong>new</strong>(io : IO, line_width : Int32 | Nil = <span class="n">nil</span>)
+
+        <a class="method-permalink" href="#new%28io%3AIO%2Cline_width%3AInt32%7CNil%3Dnil%29-class-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+          <p>Creates a new FASTA writer for an already opened IO stream.
+IO-based writers do not perform gzip auto-detection.</p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/18ab4ffa9e3d7a7b620150e5f0301d156127561d/src/fastx/fasta/writer.cr#L39" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -343,12 +399,12 @@ Automatically detects gzip compression from .gz extension.</p>
     Class Method Detail
   </h2>
   
-    <div class="entry-detail" id="open(filename:String|Path,&amp;)-class-method">
+    <div class="entry-detail" id="open(filename:String|Path,line_width:Int32|Nil=nil,&amp;)-class-method">
       <div class="signature">
         
-        def self.<strong>open</strong>(filename : String | Path, &)
+        def self.<strong>open</strong>(filename : String | Path, line_width : Int32 | Nil = <span class="n">nil</span>, &)
 
-        <a class="method-permalink" href="#open%28filename%3AString%7CPath%2C%26%29-class-method">#</a>
+        <a class="method-permalink" href="#open%28filename%3AString%7CPath%2Cline_width%3AInt32%7CNil%3Dnil%2C%26%29-class-method">#</a>
       </div>
       
         <div class="doc">
@@ -359,7 +415,28 @@ Automatically detects gzip compression from .gz extension.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/b55af8a57c6e22b59820e23936f25b8c60c6025c/src/fastx/fasta/writer.cr#L13" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/18ab4ffa9e3d7a7b620150e5f0301d156127561d/src/fastx/fasta/writer.cr#L12" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="open(io:IO,line_width:Int32|Nil=nil,&amp;)-class-method">
+      <div class="signature">
+        
+        def self.<strong>open</strong>(io : IO, line_width : Int32 | Nil = <span class="n">nil</span>, &)
+
+        <a class="method-permalink" href="#open%28io%3AIO%2Cline_width%3AInt32%7CNil%3Dnil%2C%26%29-class-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+          <p>Opens a FASTA stream for writing, yields the writer to the block, and automatically closes it.</p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/18ab4ffa9e3d7a7b620150e5f0301d156127561d/src/fastx/fasta/writer.cr#L20" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -394,7 +471,7 @@ Automatically detects gzip compression from .gz extension.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/b55af8a57c6e22b59820e23936f25b8c60c6025c/src/fastx/fasta/writer.cr#L36" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/18ab4ffa9e3d7a7b620150e5f0301d156127561d/src/fastx/fasta/writer.cr#L65" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -415,7 +492,7 @@ Automatically detects gzip compression from .gz extension.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/b55af8a57c6e22b59820e23936f25b8c60c6025c/src/fastx/fasta/writer.cr#L44" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/18ab4ffa9e3d7a7b620150e5f0301d156127561d/src/fastx/fasta/writer.cr#L73" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -436,7 +513,7 @@ Automatically detects gzip compression from .gz extension.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/b55af8a57c6e22b59820e23936f25b8c60c6025c/src/fastx/fasta/writer.cr#L30" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/18ab4ffa9e3d7a7b620150e5f0301d156127561d/src/fastx/fasta/writer.cr#L46" target="_blank">View source</a>]
         
       </div>
     </div>

@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Crystal Docs 1.17.1">
+<meta name="generator" content="Crystal Docs 1.19.1">
 <meta name="crystal_docs.project_version" content="main">
 <meta name="crystal_docs.project_name" content="fastx">
 
@@ -62,6 +62,11 @@
       
         <ul>
   
+  <li class=" " data-id="fastx/Fastx/Error" data-name="fastx::error">
+      <a href="../../Fastx/Error.html">Error</a>
+      
+    </li>
+  
   <li class="parent open current" data-id="fastx/Fastx/Fasta" data-name="fastx::fasta">
       <a href="../../Fastx/Fasta.html">Fasta</a>
       
@@ -117,6 +122,11 @@
       
     </li>
   
+  <li class=" " data-id="fastx/Fastx/InvalidBaseError" data-name="fastx::invalidbaseerror">
+      <a href="../../Fastx/InvalidBaseError.html">InvalidBaseError</a>
+      
+    </li>
+  
   <li class=" " data-id="fastx/Fastx/InvalidCharacterError" data-name="fastx::invalidcharactererror">
       <a href="../../Fastx/InvalidCharacterError.html">InvalidCharacterError</a>
       
@@ -124,6 +134,16 @@
   
   <li class=" " data-id="fastx/Fastx/InvalidFormatError" data-name="fastx::invalidformaterror">
       <a href="../../Fastx/InvalidFormatError.html">InvalidFormatError</a>
+      
+    </li>
+  
+  <li class=" " data-id="fastx/Fastx/ReaderConsumedError" data-name="fastx::readerconsumederror">
+      <a href="../../Fastx/ReaderConsumedError.html">ReaderConsumedError</a>
+      
+    </li>
+  
+  <li class=" " data-id="fastx/Fastx/UnsupportedFormatError" data-name="fastx::unsupportedformaterror">
+      <a href="../../Fastx/UnsupportedFormatError.html">UnsupportedFormatError</a>
       
     </li>
   
@@ -178,7 +198,7 @@
   </h2>
   
     
-      <a href="https://github.com/bio-cr/fastx.cr/blob/b55af8a57c6e22b59820e23936f25b8c60c6025c/src/fastx/fasta/reader.cr#L6" target="_blank">
+      <a href="https://github.com/bio-cr/fastx.cr/blob/18ab4ffa9e3d7a7b620150e5f0301d156127561d/src/fastx/fasta/reader.cr#L6" target="_blank">
         fastx/fasta/reader.cr
       </a>
     
@@ -207,6 +227,13 @@
         
       </li>
     
+      <li class="entry-summary">
+        <a href="#new%28io%3AIO%29-class-method" class="signature"><strong>.new</strong>(io : IO)</a>
+        
+          <div class="summary"><p>Creates a new FASTA reader for an already opened IO stream.</p></div>
+        
+      </li>
+    
   </ul>
 
 
@@ -225,6 +252,13 @@
         <a href="#open%28filename%3AString%7CPath%2C%26%29-class-method" class="signature"><strong>.open</strong>(filename : String | Path, &)</a>
         
           <div class="summary"><p>Opens a FASTA file, yields the reader to the block, and automatically closes it.</p></div>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#open%28io%3AIO%2C%26%29-class-method" class="signature"><strong>.open</strong>(io : IO, &)</a>
+        
+          <div class="summary"><p>Opens a FASTA stream, yields the reader to the block, and automatically closes it.</p></div>
         
       </li>
     
@@ -333,7 +367,29 @@ Automatically detects gzip compression from .gz extension.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/b55af8a57c6e22b59820e23936f25b8c60c6025c/src/fastx/fasta/reader.cr#L21" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/18ab4ffa9e3d7a7b620150e5f0301d156127561d/src/fastx/fasta/reader.cr#L30" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="new(io:IO)-class-method">
+      <div class="signature">
+        
+        def self.<strong>new</strong>(io : IO)
+
+        <a class="method-permalink" href="#new%28io%3AIO%29-class-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+          <p>Creates a new FASTA reader for an already opened IO stream.
+IO-based readers do not perform gzip auto-detection.</p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/18ab4ffa9e3d7a7b620150e5f0301d156127561d/src/fastx/fasta/reader.cr#L40" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -366,7 +422,28 @@ Automatically detects gzip compression from .gz extension.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/b55af8a57c6e22b59820e23936f25b8c60c6025c/src/fastx/fasta/reader.cr#L12" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/18ab4ffa9e3d7a7b620150e5f0301d156127561d/src/fastx/fasta/reader.cr#L13" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="open(io:IO,&amp;)-class-method">
+      <div class="signature">
+        
+        def self.<strong>open</strong>(io : IO, &)
+
+        <a class="method-permalink" href="#open%28io%3AIO%2C%26%29-class-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+          <p>Opens a FASTA stream, yields the reader to the block, and automatically closes it.</p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/18ab4ffa9e3d7a7b620150e5f0301d156127561d/src/fastx/fasta/reader.cr#L21" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -401,7 +478,7 @@ Automatically detects gzip compression from .gz extension.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/b55af8a57c6e22b59820e23936f25b8c60c6025c/src/fastx/fasta/reader.cr#L86" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/18ab4ffa9e3d7a7b620150e5f0301d156127561d/src/fastx/fasta/reader.cr#L64" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -422,7 +499,7 @@ Automatically detects gzip compression from .gz extension.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/b55af8a57c6e22b59820e23936f25b8c60c6025c/src/fastx/fasta/reader.cr#L91" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/18ab4ffa9e3d7a7b620150e5f0301d156127561d/src/fastx/fasta/reader.cr#L72" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -437,13 +514,14 @@ Automatically detects gzip compression from .gz extension.</p>
       
         <div class="doc">
           
-          <p>Iterates over each FASTA record, yielding name and sequence.</p>
+          <p>Iterates over each FASTA record, yielding name and sequence.
+This method reuses its internal sequence buffer until the next iteration.</p>
         </div>
       
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/b55af8a57c6e22b59820e23936f25b8c60c6025c/src/fastx/fasta/reader.cr#L28" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/18ab4ffa9e3d7a7b620150e5f0301d156127561d/src/fastx/fasta/reader.cr#L48" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -458,14 +536,13 @@ Automatically detects gzip compression from .gz extension.</p>
       
         <div class="doc">
           
-          <p>Iterates over each FASTA record, yielding name and sequence as String copies.
-This avoids buffer reuse issues when references to sequence data are kept.</p>
+          <p>Iterates over each FASTA record, yielding name and sequence as String copies.</p>
         </div>
       
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/b55af8a57c6e22b59820e23936f25b8c60c6025c/src/fastx/fasta/reader.cr#L59" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/18ab4ffa9e3d7a7b620150e5f0301d156127561d/src/fastx/fasta/reader.cr#L56" target="_blank">View source</a>]
         
       </div>
     </div>
