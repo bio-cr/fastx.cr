@@ -4,6 +4,137 @@ require "compress/gzip"
 
 module Fastx
   module Fastq
+    # Coordinates streaming of a single FASTQ record's sequence and quality
+    # lines over a shared `ByteLines` scanner.
+    #
+    # A FASTQ record stores sequence and quality sequentially
+    # (`@id` / sequence lines / `+` / quality lines), and the quality field has
+    # no explicit terminator: it ends once the accumulated quality length equals
+    # the sequence length. The cursor therefore tracks both lengths and requires
+    # the sequence to be fully consumed before quality is read (it auto-drains
+    # the sequence if the caller skips it).
+    private class RecordCursor
+      getter line_number : Int32
+      getter sequence_length : Int32 = 0
+      getter quality_length : Int32 = 0
+      getter? sequence_done : Bool = false
+      getter? quality_done : Bool = false
+
+      def initialize(@lines : ByteLines, @id : String, @source_label : String, @line_number : Int32)
+      end
+
+      # Returns the next sequence line, or `nil` once the `+` separator is
+      # reached (the separator is consumed).
+      def next_sequence_line : Bytes?
+        return if @sequence_done
+
+        line = @lines.next_line
+        raise_incomplete("'+' separator") if line.nil?
+        @line_number += 1
+
+        if line.size > 0 && line[0] == 0x2Bu8 # '+'
+          @sequence_done = true
+          return
+        end
+
+        validate_ascii!(line)
+        @sequence_length += line.size
+        line
+      end
+
+      # Returns the next quality line, or `nil` once the accumulated quality
+      # length reaches the sequence length. Auto-drains the sequence first so the
+      # target length is known even if the caller skipped the sequence stream.
+      def next_quality_line : Bytes?
+        drain_sequence unless @sequence_done
+        return if @quality_done
+
+        line = @lines.next_line
+        raise_incomplete("quality") if line.nil?
+        @line_number += 1
+
+        validate_ascii!(line)
+        @quality_length += line.size
+        if @quality_length >= @sequence_length
+          @quality_done = true
+          if @quality_length > @sequence_length
+            raise InvalidFormatError.new(
+              @source_label, @line_number, String.new(line),
+              "quality is longer than sequence: sequence=#{@sequence_length}, quality=#{@quality_length}"
+            )
+          end
+        end
+        line
+      end
+
+      def drain_sequence : Nil
+        while next_sequence_line
+        end
+      end
+
+      # Consumes any unread sequence and quality lines, leaving the scanner
+      # positioned at the next record. Also surfaces length-mismatch errors when
+      # the caller did not read the streams to completion.
+      def drain : Nil
+        drain_sequence unless @sequence_done
+        while next_quality_line
+        end
+      end
+
+      private def validate_ascii!(line : Bytes) : Nil
+        line.each do |byte|
+          raise InvalidCharacterError.new(@source_label, @id, String.new(line)) if byte > 0x7Fu8
+        end
+      end
+
+      private def raise_incomplete(expected : String) : NoReturn
+        raise InvalidFormatError.new(
+          @source_label, @line_number, "", "Incomplete FASTQ record: expected #{expected}"
+        )
+      end
+    end
+
+    # Streams the sequence lines of a single FASTQ record as borrowed `Bytes`.
+    #
+    # Each yielded slice points into a buffer reused on every line and is only
+    # valid until the next line is read. Copy it (`String.new(bytes)` or
+    # `bytes.dup`) to keep it.
+    class SequenceLines
+      def initialize(@cursor : RecordCursor)
+      end
+
+      def each(& : Bytes ->) : Nil
+        while line = @cursor.next_sequence_line
+          yield line
+        end
+      end
+
+      def drain : Nil
+        @cursor.drain_sequence
+      end
+    end
+
+    # Streams the quality lines of a single FASTQ record as borrowed `Bytes`.
+    #
+    # The sequence stream is consumed first (automatically, if the caller skips
+    # it) so the quality field's length is known. Each yielded slice is only
+    # valid until the next line is read; copy it to keep it.
+    class QualityLines
+      def initialize(@cursor : RecordCursor)
+      end
+
+      def each(& : Bytes ->) : Nil
+        while line = @cursor.next_quality_line
+          yield line
+        end
+      end
+
+      def drain : Nil
+        while @cursor.next_quality_line
+        end
+      end
+    end
+
     class Reader
       @filename : Path?
       @file : File?
@@ -64,6 +195,39 @@ module Fastx
         ensure_not_consumed!
         each_record do |identifier, sequence, quality|
           yield identifier, sequence, quality
+        end
+      end
+
+      # Iterates over FASTQ records while streaming each record's sequence and
+      # quality lines without accumulating the full fields in memory.
+      #
+      # The yielded identifier is an owned `String`. `SequenceLines#each` and
+      # `QualityLines#each` yield borrowed `Bytes` slices into an internal buffer;
+      # each slice is only valid until the next line is read. Copy it
+      # (`String.new(bytes)` or `bytes.dup`) to keep it.
+      #
+      # The quality field ends once its accumulated length matches the sequence
+      # length, so the sequence stream is consumed before quality (automatically,
+      # if the caller skips it). Because the streams are not buffered, a
+      # sequence/quality length mismatch is detected while reading rather than
+      # up front.
+      def each_record_lines(& : String, SequenceLines, QualityLines ->)
+        ensure_not_consumed!
+
+        lines = ByteLines.new(@io)
+        line_number = 0
+
+        loop do
+          line = lines.next_line
+          return if line.nil?
+          line_number += 1
+          ensure_prefix!(line, 0x40u8, line_number, "Identifier line must start with '@'")
+
+          id = String.new(line[1, line.size - 1])
+          cursor = RecordCursor.new(lines, id, source_label, line_number)
+          yield id, SequenceLines.new(cursor), QualityLines.new(cursor)
+          cursor.drain
+          line_number = cursor.line_number
         end
       end
 

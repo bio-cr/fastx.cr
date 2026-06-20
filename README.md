@@ -55,6 +55,21 @@ Fastx::Fasta::Reader.open("reads.fa") do |reader|
 end
 ```
 
+For large genomes you can stream each record line by line with
+`#each_record_lines`, which never accumulates the full sequence in memory:
+
+```crystal
+Fastx::Fasta::Reader.open("genome.fa") do |reader|
+  reader.each_record_lines do |name, lines|
+    length = 0
+    lines.each do |line| # line is borrowed Bytes, valid until the next line
+      length += line.size
+    end
+    puts "#{name}\t#{length}"
+  end
+end
+```
+
 ## Read FASTQ
 
 ```crystal
@@ -72,6 +87,21 @@ Fastx::Fastq::Reader.open("reads.fq") do |reader|
   reader.each_bytes do |identifier, sequence, quality|
     # All three are borrowed Bytes, valid only until the next iteration.
     puts "#{String.new(identifier)}\t#{sequence.size}\t#{quality.size}"
+  end
+end
+```
+
+`#each_record_lines` streams each record's sequence and quality line by line.
+The quality field ends once its length matches the sequence, so the sequence
+stream is consumed before quality (automatically, if you skip it):
+
+```crystal
+Fastx::Fastq::Reader.open("long_reads.fq") do |reader|
+  reader.each_record_lines do |identifier, sequence, quality|
+    seq_len = 0
+    sequence.each { |line| seq_len += line.size }
+    quality.each { |line| process(line) } # borrowed Bytes, copy to retain
+    puts "#{identifier}\t#{seq_len}"
   end
 end
 ```
@@ -142,11 +172,11 @@ end
 
 - `Reader#each` yields owned `String` values you can store safely.
 - `Reader#each_bytes` yields borrowed `Bytes` (`Slice(UInt8)`) and reuses internal buffers for performance.
-- Values yielded by `#each_bytes` are only valid until the next iteration; copy them (`String.new(bytes)` / `bytes.dup`) to retain them.
+- `Reader#each_record_lines` streams each record line by line as borrowed `Bytes` without accumulating the full sequence (FASTQ also exposes the quality lines).
+- Values yielded by `#each_bytes` / `#each_record_lines` are only valid until the next iteration; copy them (`String.new(bytes)` / `bytes.dup`) to retain them.
 - Readers are one-pass. Create a new reader to read again.
 - Reader and writer instances are not thread-safe.
-- `Fastx::Fastq::Reader` currently supports four-line FASTQ records only.
-- Multi-line FASTQ is not supported.
+- `Fastx::Fastq::Reader#each` / `#each_bytes` support four-line FASTQ records only. `#each_record_lines` also handles multi-line (wrapped) FASTA and FASTQ.
 - FASTQ reader and writer validate sequence/quality length equality.
 
 ## Base Encoding

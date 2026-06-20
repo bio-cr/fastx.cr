@@ -73,6 +73,70 @@ describe Fastx::Fasta::Reader do
     reader.close
   end
 
+  it "should stream a fasta file with each_record_lines" do
+    reader = Fastx::Fasta::Reader.new(Path[__DIR__, "fixtures/moo.fa"])
+    starts = [] of String
+    lengths = [] of Int32
+
+    reader.each_record_lines do |name, lines|
+      starts << name
+      length = 0
+      lines.each do |line|
+        length += line.size
+      end
+      lengths << length
+    end
+
+    starts.should eq ["chr1 1", "chr2 2"]
+    lengths.should eq [1000, 900]
+    reader.close
+  end
+
+  it "should stream a gzip compressed fasta file with each_record_lines" do
+    reader = Fastx::Fasta::Reader.new(Path[__DIR__, "fixtures/moo.fa.gz"])
+    lengths = [] of Int32
+
+    reader.each_record_lines do |_, lines|
+      length = 0
+      lines.each do |line|
+        length += line.size
+      end
+      lengths << length
+    end
+
+    lengths.should eq [1000, 900]
+    reader.close
+  end
+
+  it "should drain unread lines after each_record_lines block" do
+    io = IO::Memory.new(">seq1\nAC\nGT\n>seq2\nTT\n")
+    reader = Fastx::Fasta::Reader.new(io)
+    names = [] of String
+
+    reader.each_record_lines do |name, _|
+      names << name
+    end
+
+    names.should eq ["seq1", "seq2"]
+    reader.close
+  end
+
+  it "should raise InvalidCharacterError from each_record_lines for non-ASCII characters" do
+    tempfile = File.tempfile("invalid.fa")
+    File.write(tempfile.path, ">test\nACGT\u{1F600}ACGT\n")
+
+    reader = Fastx::Fasta::Reader.new(tempfile.path)
+    expect_raises(Fastx::InvalidCharacterError) do
+      reader.each_record_lines do |_, lines|
+        lines.each do |_|
+          # This should raise an exception
+        end
+      end
+    end
+    reader.close
+    tempfile.delete
+  end
+
   it "should support reading from IO::Memory" do
     io = IO::Memory.new(">seq1\nAC\nGT\n>seq2\nTT\n")
     reader = Fastx::Fasta::Reader.new(io)

@@ -4,6 +4,48 @@ require "compress/gzip"
 
 module Fastx
   module Fasta
+    class SequenceLines
+      def initialize(
+        @lines : ByteLines,
+        @name : String,
+        @source_label : String,
+        @set_pending_name : Proc(String, Nil),
+      )
+        @done = false
+      end
+
+      def each(& : Bytes ->)
+        return if @done
+
+        while line = @lines.next_line
+          if fasta_header?(line)
+            @set_pending_name.call(String.new(line[1, line.size - 1]))
+            @done = true
+            return
+          end
+
+          validate_ascii_line!(line)
+          yield line
+        end
+
+        @done = true
+      end
+
+      def drain
+        each { |_| }
+      end
+
+      private def fasta_header?(line : Bytes) : Bool
+        line.size > 0 && line[0] == 0x3Eu8
+      end
+
+      private def validate_ascii_line!(line : Bytes)
+        line.each do |byte|
+          raise InvalidCharacterError.new(@source_label, @name, String.new(line)) if byte > 0x7Fu8
+        end
+      end
+    end
+
     class Reader
       @filename : Path?
       @file : File?
@@ -67,6 +109,35 @@ module Fastx
         end
       end
 
+      # Iterates over FASTA records while streaming sequence lines without
+      # accumulating the full sequence in memory.
+      #
+      # The yielded name is an owned `String`. `SequenceLines#each` yields
+      # borrowed `Bytes` slices into an internal buffer; each slice is only valid
+      # until the next line is read. Copy it (`String.new(bytes)` or `bytes.dup`)
+      # to keep it.
+      def each_record_lines(& : String, SequenceLines ->)
+        ensure_not_consumed!
+
+        lines = ByteLines.new(@io)
+        pending_name = nil
+
+        loop do
+          name = pending_name
+          pending_name = nil
+
+          until name
+            line = lines.next_line
+            return unless line
+            name = String.new(line[1, line.size - 1]) if fasta_header?(line)
+          end
+
+          sequence_lines = SequenceLines.new(lines, name, source_label, ->(next_name : String) { pending_name = next_name })
+          yield name, sequence_lines
+          sequence_lines.drain
+        end
+      end
+
       # Closes the file handle.
       def close
         @io.close unless @io.closed?
@@ -112,6 +183,16 @@ module Fastx
         end
 
         sequence.write(line)
+      end
+
+      private def validate_ascii_line!(line : Bytes, name : String)
+        line.each do |byte|
+          raise InvalidCharacterError.new(source_label, name, String.new(line)) if byte > 0x7Fu8
+        end
+      end
+
+      private def fasta_header?(line : Bytes) : Bool
+        line.size > 0 && line[0] == 0x3Eu8
       end
 
       private def source_label

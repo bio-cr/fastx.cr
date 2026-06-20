@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.2.0
+
+### API
+
+- Added streaming line iteration so records can be processed without holding the
+  full sequence (and quality) in memory:
+  - `Fasta::Reader#each_record_lines` yields `(name : String, SequenceLines)`.
+  - `Fastq::Reader#each_record_lines` yields
+    `(identifier : String, SequenceLines, QualityLines)`, mirroring the
+    `(id, seq, qual)` arity of `#each` / `#each_bytes`.
+  `SequenceLines#each` / `QualityLines#each` yield borrowed `Bytes` slices that
+  point into a reusable buffer and are only valid until the next line is read;
+  copy them (`String.new(bytes)` / `bytes.dup`) to retain them.
+- For FASTQ, the quality field has no explicit terminator, so the sequence
+  stream is consumed before quality (automatically, if the caller skips it).
+  A sequence/quality length mismatch is therefore reported while reading rather
+  than up front.
+
 ## 0.1.1
 
 ### Performance
