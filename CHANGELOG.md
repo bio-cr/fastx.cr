@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.1
+
+### Performance
+
+- Tuned the byte reader and `decode_phred` fast paths while keeping the public
+  API unchanged.
+
 ## 0.1.0
 
 ### API
