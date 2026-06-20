@@ -27,8 +27,14 @@ module Fastx
       count = @size - @start
       return if count <= 0
 
-      relative = @buffer[@start, count].index(0x0Au8)
-      relative ? @start + relative : nil
+      # `Slice#index` also uses memchr, but its bounds-checking/sub-slice overhead
+      # measures ~1.2-1.3x slower here, and this is the hottest inner loop
+      # (called once per line). Keep the direct memchr call.
+      buffer = @buffer.to_unsafe
+      found = LibC.memchr(buffer + @start, 0x0A, count)
+      return if found.null?
+
+      (found.as(UInt8*) - buffer).to_i
     end
 
     private def final_line : Bytes?
