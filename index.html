@@ -202,11 +202,13 @@
     puts <span class="s">&quot;</span><span class="i">#{</span>header<span class="i">}</span><span class="s">\t</span><span class="i">#{</span>sequence.bytesize<span class="i">}</span><span class="s">&quot;</span>
   <span class="k">end</span>
 <span class="k">end</span></code></pre>
-<p>Use <code>#each_copy</code> if you need to keep records after the current iteration:</p>
+<p><code>#each</code> yields owned <code>String</code> values. Use <code>#each_bytes</code> for lower-allocation
+iteration with borrowed <code>Bytes</code>:</p>
 <pre><code class="language-crystal"><span class="t">Fastx</span><span class="t">::</span><span class="t">Fasta</span><span class="t">::</span><span class="t">Reader</span>.open(<span class="s">&quot;reads.fa&quot;</span>) <span class="k">do</span> <span class="o">|</span>reader<span class="o">|</span>
-  reader.each_copy <span class="k">do</span> <span class="o">|</span>header, sequence<span class="o">|</span>
-    stored_header <span class="o">=</span> header
-    stored_sequence <span class="o">=</span> sequence
+  reader.each_bytes <span class="k">do</span> <span class="o">|</span>header, sequence<span class="o">|</span>
+    <span class="c"># header and sequence are borrowed Bytes (Slice(UInt8)),</span>
+    <span class="c"># valid only until the next iteration.</span>
+    puts <span class="s">&quot;</span><span class="i">#{</span><span class="t">String</span>.new(header)<span class="i">}</span><span class="s">\t</span><span class="i">#{</span>sequence.size<span class="i">}</span><span class="s">&quot;</span>
   <span class="k">end</span>
 <span class="k">end</span></code></pre>
 <h2><a id="read-fastq" class="anchor" href="#read-fastq">
@@ -219,12 +221,11 @@
     puts <span class="s">&quot;</span><span class="i">#{</span>identifier<span class="i">}</span><span class="s">\t</span><span class="i">#{</span>sequence.bytesize<span class="i">}</span><span class="s">\t</span><span class="i">#{</span>quality.bytesize<span class="i">}</span><span class="s">&quot;</span>
   <span class="k">end</span>
 <span class="k">end</span></code></pre>
-<p>Use <code>#each_copy</code> if you need safe <code>String</code> copies:</p>
+<p>Use <code>#each_bytes</code> if you want borrowed <code>Bytes</code>:</p>
 <pre><code class="language-crystal"><span class="t">Fastx</span><span class="t">::</span><span class="t">Fastq</span><span class="t">::</span><span class="t">Reader</span>.open(<span class="s">&quot;reads.fq&quot;</span>) <span class="k">do</span> <span class="o">|</span>reader<span class="o">|</span>
-  reader.each_copy <span class="k">do</span> <span class="o">|</span>identifier, sequence, quality<span class="o">|</span>
-    saved_id <span class="o">=</span> identifier
-    saved_sequence <span class="o">=</span> sequence
-    saved_quality <span class="o">=</span> quality
+  reader.each_bytes <span class="k">do</span> <span class="o">|</span>identifier, sequence, quality<span class="o">|</span>
+    <span class="c"># All three are borrowed Bytes, valid only until the next iteration.</span>
+    puts <span class="s">&quot;</span><span class="i">#{</span><span class="t">String</span>.new(identifier)<span class="i">}</span><span class="s">\t</span><span class="i">#{</span>sequence.size<span class="i">}</span><span class="s">\t</span><span class="i">#{</span>quality.size<span class="i">}</span><span class="s">&quot;</span>
   <span class="k">end</span>
 <span class="k">end</span></code></pre>
 <h2><a id="write-fasta" class="anchor" href="#write-fasta">
@@ -256,7 +257,7 @@
 <pre><code class="language-crystal">io <span class="o">=</span> <span class="t">IO</span><span class="t">::</span><span class="t">Memory</span>.new(<span class="s">&quot;@seq1\nACGT\n+\n!!!!\n&quot;</span>)
 reader <span class="o">=</span> <span class="t">Fastx</span><span class="t">::</span><span class="t">Fastq</span><span class="t">::</span><span class="t">Reader</span>.new(io)
 
-reader.each_copy <span class="k">do</span> <span class="o">|</span>identifier, sequence, quality<span class="o">|</span>
+reader.each <span class="k">do</span> <span class="o">|</span>identifier, sequence, quality<span class="o">|</span>
   puts <span class="s">&quot;</span><span class="i">#{</span>identifier<span class="i">}</span><span class="s">\t</span><span class="i">#{</span>sequence<span class="i">}</span><span class="s">\t</span><span class="i">#{</span>quality<span class="i">}</span><span class="s">&quot;</span>
 <span class="k">end</span></code></pre>
 <pre><code class="language-crystal">io <span class="o">=</span> <span class="t">IO</span><span class="t">::</span><span class="t">Memory</span>.new
@@ -284,9 +285,9 @@ puts io.to_s</code></pre>
   </svg>
 </a>Behavior And Limits</h2>
 <ul>
-<li><code>Reader#each</code> reuses internal buffers for performance.</li>
-<li>Values yielded by <code>#each</code> are only valid until the next iteration.</li>
-<li>Use <code>#each_copy</code> if you want values you can store safely.</li>
+<li><code>Reader#each</code> yields owned <code>String</code> values you can store safely.</li>
+<li><code>Reader#each_bytes</code> yields borrowed <code>Bytes</code> (<code>Slice(UInt8)</code>) and reuses internal buffers for performance.</li>
+<li>Values yielded by <code>#each_bytes</code> are only valid until the next iteration; copy them (<code>String.new(bytes)</code> / <code>bytes.dup</code>) to retain them.</li>
 <li>Readers are one-pass. Create a new reader to read again.</li>
 <li>Reader and writer instances are not thread-safe.</li>
 <li><code><a href="Fastx/Fastq/Reader.html">Fastx::Fastq::Reader</a></code> currently supports four-line FASTQ records only.</li>

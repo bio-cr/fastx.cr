@@ -196,70 +196,77 @@
   </h2>
   
     
-      <a href="https://github.com/bio-cr/fastx.cr/blob/18ab4ffa9e3d7a7b620150e5f0301d156127561d/src/fastx.cr#L6" target="_blank">
+      <a href="https://github.com/bio-cr/fastx.cr/blob/b9fcd6589ba2d7b8148d29ae6042ad93a22a5555/src/fastx.cr#L6" target="_blank">
         fastx.cr
       </a>
     
     <br/>
   
     
-      <a href="https://github.com/bio-cr/fastx.cr/blob/18ab4ffa9e3d7a7b620150e5f0301d156127561d/src/fastx/exceptions.cr#L1" target="_blank">
+      <a href="https://github.com/bio-cr/fastx.cr/blob/b9fcd6589ba2d7b8148d29ae6042ad93a22a5555/src/fastx/byte_lines.cr#L1" target="_blank">
+        fastx/byte_lines.cr
+      </a>
+    
+    <br/>
+  
+    
+      <a href="https://github.com/bio-cr/fastx.cr/blob/b9fcd6589ba2d7b8148d29ae6042ad93a22a5555/src/fastx/exceptions.cr#L1" target="_blank">
         fastx/exceptions.cr
       </a>
     
     <br/>
   
     
-      <a href="https://github.com/bio-cr/fastx.cr/blob/18ab4ffa9e3d7a7b620150e5f0301d156127561d/src/fastx/fasta.cr#L4" target="_blank">
+      <a href="https://github.com/bio-cr/fastx.cr/blob/b9fcd6589ba2d7b8148d29ae6042ad93a22a5555/src/fastx/fasta.cr#L4" target="_blank">
         fastx/fasta.cr
       </a>
     
     <br/>
   
     
-      <a href="https://github.com/bio-cr/fastx.cr/blob/18ab4ffa9e3d7a7b620150e5f0301d156127561d/src/fastx/fasta/reader.cr#L4" target="_blank">
+      <a href="https://github.com/bio-cr/fastx.cr/blob/b9fcd6589ba2d7b8148d29ae6042ad93a22a5555/src/fastx/fasta/reader.cr#L5" target="_blank">
         fastx/fasta/reader.cr
       </a>
     
     <br/>
   
     
-      <a href="https://github.com/bio-cr/fastx.cr/blob/18ab4ffa9e3d7a7b620150e5f0301d156127561d/src/fastx/fasta/writer.cr#L4" target="_blank">
+      <a href="https://github.com/bio-cr/fastx.cr/blob/b9fcd6589ba2d7b8148d29ae6042ad93a22a5555/src/fastx/fasta/writer.cr#L4" target="_blank">
         fastx/fasta/writer.cr
       </a>
     
     <br/>
   
     
-      <a href="https://github.com/bio-cr/fastx.cr/blob/18ab4ffa9e3d7a7b620150e5f0301d156127561d/src/fastx/fastq.cr#L4" target="_blank">
+      <a href="https://github.com/bio-cr/fastx.cr/blob/b9fcd6589ba2d7b8148d29ae6042ad93a22a5555/src/fastx/fastq.cr#L4" target="_blank">
         fastx/fastq.cr
       </a>
     
     <br/>
   
     
-      <a href="https://github.com/bio-cr/fastx.cr/blob/18ab4ffa9e3d7a7b620150e5f0301d156127561d/src/fastx/fastq/reader.cr#L4" target="_blank">
+      <a href="https://github.com/bio-cr/fastx.cr/blob/b9fcd6589ba2d7b8148d29ae6042ad93a22a5555/src/fastx/fastq/reader.cr#L5" target="_blank">
         fastx/fastq/reader.cr
       </a>
     
     <br/>
   
     
-      <a href="https://github.com/bio-cr/fastx.cr/blob/18ab4ffa9e3d7a7b620150e5f0301d156127561d/src/fastx/fastq/writer.cr#L4" target="_blank">
+      <a href="https://github.com/bio-cr/fastx.cr/blob/b9fcd6589ba2d7b8148d29ae6042ad93a22a5555/src/fastx/fastq/writer.cr#L4" target="_blank">
         fastx/fastq/writer.cr
       </a>
     
     <br/>
   
     
-      <a href="https://github.com/bio-cr/fastx.cr/blob/18ab4ffa9e3d7a7b620150e5f0301d156127561d/src/fastx/format.cr#L1" target="_blank">
+      <a href="https://github.com/bio-cr/fastx.cr/blob/b9fcd6589ba2d7b8148d29ae6042ad93a22a5555/src/fastx/format.cr#L1" target="_blank">
         fastx/format.cr
       </a>
     
     <br/>
   
     
-      <a href="https://github.com/bio-cr/fastx.cr/blob/18ab4ffa9e3d7a7b620150e5f0301d156127561d/src/fastx/version.cr#L1" target="_blank">
+      <a href="https://github.com/bio-cr/fastx.cr/blob/b9fcd6589ba2d7b8148d29ae6042ad93a22a5555/src/fastx/version.cr#L1" target="_blank">
         fastx/version.cr
       </a>
     
@@ -303,9 +310,37 @@
   <ul class="list-summary">
     
       <li class="entry-summary">
+        <a href="#decode_bases%28bases%3ABytes%29%3AString-class-method" class="signature"><strong>.decode_bases</strong>(bases : Bytes) : String</a>
+        
+          <div class="summary"><p>Converts a UInt8 array (ASCII codes) to a DNA string.</p></div>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#decode_bases%28bases%3AArray%28UInt8%29%29%3AString-class-method" class="signature"><strong>.decode_bases</strong>(bases : Array(UInt8)) : String</a>
+        
+          <div class="summary"><p>Converts a UInt8 array (ASCII codes) to a DNA string.</p></div>
+        
+      </li>
+    
+      <li class="entry-summary">
         <a href="#decode_bases%28bases%3AEnumerable%28UInt8%29%29%3AString-class-method" class="signature"><strong>.decode_bases</strong>(bases : Enumerable(UInt8)) : String</a>
         
           <div class="summary"><p>Converts a UInt8 array (ASCII codes) to a DNA string.</p></div>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#decode_phred%28scores%3ABytes%2Coffset%3D33%29%3AString-class-method" class="signature"><strong>.decode_phred</strong>(scores : Bytes, offset = <span class="n">33</span>) : String</a>
+        
+          <div class="summary"><p>Converts an array of Phred scores to a quality string.</p></div>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#decode_phred%28scores%3AArray%28UInt8%29%2Coffset%3D33%29%3AString-class-method" class="signature"><strong>.decode_phred</strong>(scores : Array(UInt8), offset = <span class="n">33</span>) : String</a>
+        
+          <div class="summary"><p>Converts an array of Phred scores to a quality string.</p></div>
         
       </li>
     
@@ -317,9 +352,23 @@
       </li>
     
       <li class="entry-summary">
-        <a href="#encode_bases%28sequence%3AIO%3A%3AMemory%7CString%2C%2A%2Ciupac%3ABool%3Dfalse%2Cstrict%3ABool%3Dfalse%29%3ASlice%28UInt8%29-class-method" class="signature"><strong>.encode_bases</strong>(sequence : IO::Memory | String, *, iupac : Bool = <span class="n">false</span>, strict : Bool = <span class="n">false</span>) : Slice(UInt8)</a>
+        <a href="#encode_bases%28sequence%3ABytes%2C%2A%2Ciupac%3ABool%3Dfalse%2Cstrict%3ABool%3Dfalse%29%3ASlice%28UInt8%29-class-method" class="signature"><strong>.encode_bases</strong>(sequence : Bytes, *, iupac : Bool = <span class="n">false</span>, strict : Bool = <span class="n">false</span>) : Slice(UInt8)</a>
         
-          <div class="summary"><p>Converts a DNA sequence (String or IO::Memory) to a UInt8 slice, where each base is encoded as a single byte.</p></div>
+          <div class="summary"><p>Converts a DNA sequence (<code>Bytes</code> or <code>String</code>) to a UInt8 slice, where each base is encoded as a single byte.</p></div>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#encode_bases%28sequence%3AString%2C%2A%2Ciupac%3ABool%3Dfalse%2Cstrict%3ABool%3Dfalse%29%3ASlice%28UInt8%29-class-method" class="signature"><strong>.encode_bases</strong>(sequence : String, *, iupac : Bool = <span class="n">false</span>, strict : Bool = <span class="n">false</span>) : Slice(UInt8)</a>
+        
+          <div class="summary"><p>Converts a DNA sequence (<code>Bytes</code> or <code>String</code>) to a UInt8 slice, where each base is encoded as a single byte.</p></div>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#encode_phred%28quality%3ABytes%2Coffset%3D33%29%3AArray%28UInt8%29-class-method" class="signature"><strong>.encode_phred</strong>(quality : Bytes, offset = <span class="n">33</span>) : Array(UInt8)</a>
+        
+          <div class="summary"><p>Converts a quality sequence (<code>Bytes</code>) to an array of Phred scores.</p></div>
         
       </li>
     
@@ -375,6 +424,48 @@
     Class Method Detail
   </h2>
   
+    <div class="entry-detail" id="decode_bases(bases:Bytes):String-class-method">
+      <div class="signature">
+        
+        def self.<strong>decode_bases</strong>(bases : Bytes) : String
+
+        <a class="method-permalink" href="#decode_bases%28bases%3ABytes%29%3AString-class-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+          <p>Converts a UInt8 array (ASCII codes) to a DNA string.</p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/b9fcd6589ba2d7b8148d29ae6042ad93a22a5555/src/fastx.cr#L111" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="decode_bases(bases:Array(UInt8)):String-class-method">
+      <div class="signature">
+        
+        def self.<strong>decode_bases</strong>(bases : Array(UInt8)) : String
+
+        <a class="method-permalink" href="#decode_bases%28bases%3AArray%28UInt8%29%29%3AString-class-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+          <p>Converts a UInt8 array (ASCII codes) to a DNA string.</p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/b9fcd6589ba2d7b8148d29ae6042ad93a22a5555/src/fastx.cr#L116" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
     <div class="entry-detail" id="decode_bases(bases:Enumerable(UInt8)):String-class-method">
       <div class="signature">
         
@@ -391,7 +482,49 @@
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/18ab4ffa9e3d7a7b620150e5f0301d156127561d/src/fastx.cr#L106" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/b9fcd6589ba2d7b8148d29ae6042ad93a22a5555/src/fastx.cr#L121" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="decode_phred(scores:Bytes,offset=33):String-class-method">
+      <div class="signature">
+        
+        def self.<strong>decode_phred</strong>(scores : Bytes, offset = <span class="n">33</span>) : String
+
+        <a class="method-permalink" href="#decode_phred%28scores%3ABytes%2Coffset%3D33%29%3AString-class-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+          <p>Converts an array of Phred scores to a quality string.</p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/b9fcd6589ba2d7b8148d29ae6042ad93a22a5555/src/fastx/fastq.cr#L56" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="decode_phred(scores:Array(UInt8),offset=33):String-class-method">
+      <div class="signature">
+        
+        def self.<strong>decode_phred</strong>(scores : Array(UInt8), offset = <span class="n">33</span>) : String
+
+        <a class="method-permalink" href="#decode_phred%28scores%3AArray%28UInt8%29%2Coffset%3D33%29%3AString-class-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+          <p>Converts an array of Phred scores to a quality string.</p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/b9fcd6589ba2d7b8148d29ae6042ad93a22a5555/src/fastx/fastq.cr#L68" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -412,22 +545,22 @@
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/18ab4ffa9e3d7a7b620150e5f0301d156127561d/src/fastx/fastq.cr#L51" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/b9fcd6589ba2d7b8148d29ae6042ad93a22a5555/src/fastx/fastq.cr#L80" target="_blank">View source</a>]
         
       </div>
     </div>
   
-    <div class="entry-detail" id="encode_bases(sequence:IO::Memory|String,*,iupac:Bool=false,strict:Bool=false):Slice(UInt8)-class-method">
+    <div class="entry-detail" id="encode_bases(sequence:Bytes,*,iupac:Bool=false,strict:Bool=false):Slice(UInt8)-class-method">
       <div class="signature">
         
-        def self.<strong>encode_bases</strong>(sequence : IO::Memory | String, *, iupac : Bool = <span class="n">false</span>, strict : Bool = <span class="n">false</span>) : Slice(UInt8)
+        def self.<strong>encode_bases</strong>(sequence : Bytes, *, iupac : Bool = <span class="n">false</span>, strict : Bool = <span class="n">false</span>) : Slice(UInt8)
 
-        <a class="method-permalink" href="#encode_bases%28sequence%3AIO%3A%3AMemory%7CString%2C%2A%2Ciupac%3ABool%3Dfalse%2Cstrict%3ABool%3Dfalse%29%3ASlice%28UInt8%29-class-method">#</a>
+        <a class="method-permalink" href="#encode_bases%28sequence%3ABytes%2C%2A%2Ciupac%3ABool%3Dfalse%2Cstrict%3ABool%3Dfalse%29%3ASlice%28UInt8%29-class-method">#</a>
       </div>
       
         <div class="doc">
           
-          <p>Converts a DNA sequence (String or IO::Memory) to a UInt8 slice,
+          <p>Converts a DNA sequence (<code>Bytes</code> or <code>String</code>) to a UInt8 slice,
 where each base is encoded as a single byte.
 When iupac is true, supports IUPAC nucleotide codes (R, Y, S, W, K, M, B, D, H, V).
 When iupac is false, only standard bases (A, C, G, T, N) are preserved.
@@ -438,7 +571,54 @@ This representation is suitable for byte-wise or array processing.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/18ab4ffa9e3d7a7b620150e5f0301d156127561d/src/fastx.cr#L99" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/b9fcd6589ba2d7b8148d29ae6042ad93a22a5555/src/fastx.cr#L99" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="encode_bases(sequence:String,*,iupac:Bool=false,strict:Bool=false):Slice(UInt8)-class-method">
+      <div class="signature">
+        
+        def self.<strong>encode_bases</strong>(sequence : String, *, iupac : Bool = <span class="n">false</span>, strict : Bool = <span class="n">false</span>) : Slice(UInt8)
+
+        <a class="method-permalink" href="#encode_bases%28sequence%3AString%2C%2A%2Ciupac%3ABool%3Dfalse%2Cstrict%3ABool%3Dfalse%29%3ASlice%28UInt8%29-class-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+          <p>Converts a DNA sequence (<code>Bytes</code> or <code>String</code>) to a UInt8 slice,
+where each base is encoded as a single byte.
+When iupac is true, supports IUPAC nucleotide codes (R, Y, S, W, K, M, B, D, H, V).
+When iupac is false, only standard bases (A, C, G, T, N) are preserved.
+Non-recognized characters are converted to N (78u8).
+This representation is suitable for byte-wise or array processing.</p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/b9fcd6589ba2d7b8148d29ae6042ad93a22a5555/src/fastx.cr#L106" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="encode_phred(quality:Bytes,offset=33):Array(UInt8)-class-method">
+      <div class="signature">
+        
+        def self.<strong>encode_phred</strong>(quality : Bytes, offset = <span class="n">33</span>) : Array(UInt8)
+
+        <a class="method-permalink" href="#encode_phred%28quality%3ABytes%2Coffset%3D33%29%3AArray%28UInt8%29-class-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+          <p>Converts a quality sequence (<code>Bytes</code>) to an array of Phred scores.</p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/b9fcd6589ba2d7b8148d29ae6042ad93a22a5555/src/fastx/fastq.cr#L42" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -459,7 +639,7 @@ This representation is suitable for byte-wise or array processing.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/18ab4ffa9e3d7a7b620150e5f0301d156127561d/src/fastx/fastq.cr#L42" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/b9fcd6589ba2d7b8148d29ae6042ad93a22a5555/src/fastx/fastq.cr#L51" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -483,7 +663,7 @@ Non-recognized characters are converted to N (78u8).</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/18ab4ffa9e3d7a7b620150e5f0301d156127561d/src/fastx.cr#L43" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/b9fcd6589ba2d7b8148d29ae6042ad93a22a5555/src/fastx.cr#L43" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -505,7 +685,7 @@ Yields the appropriate Reader/Writer to the block and automatically closes it.</
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/18ab4ffa9e3d7a7b620150e5f0301d156127561d/src/fastx.cr#L9" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/b9fcd6589ba2d7b8148d29ae6042ad93a22a5555/src/fastx.cr#L9" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -527,7 +707,7 @@ Returns the appropriate Reader/Writer instance (manual close required).</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/18ab4ffa9e3d7a7b620150e5f0301d156127561d/src/fastx.cr#L25" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/b9fcd6589ba2d7b8148d29ae6042ad93a22a5555/src/fastx.cr#L25" target="_blank">View source</a>]
         
       </div>
     </div>

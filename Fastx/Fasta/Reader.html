@@ -198,7 +198,7 @@
   </h2>
   
     
-      <a href="https://github.com/bio-cr/fastx.cr/blob/18ab4ffa9e3d7a7b620150e5f0301d156127561d/src/fastx/fasta/reader.cr#L6" target="_blank">
+      <a href="https://github.com/bio-cr/fastx.cr/blob/b9fcd6589ba2d7b8148d29ae6042ad93a22a5555/src/fastx/fasta/reader.cr#L7" target="_blank">
         fastx/fasta/reader.cr
       </a>
     
@@ -293,16 +293,16 @@
       </li>
     
       <li class="entry-summary">
-        <a href="#each%28%26%29-instance-method" class="signature"><strong>#each</strong>(&)</a>
+        <a href="#each%28%26%3AString%2CString-%3E%29-instance-method" class="signature"><strong>#each</strong>(& : String, String -> )</a>
         
-          <div class="summary"><p>Iterates over each FASTA record, yielding name and sequence.</p></div>
+          <div class="summary"><p>Iterates over each FASTA record, yielding name and sequence as owned <code>String</code> copies that remain valid after iteration.</p></div>
         
       </li>
     
       <li class="entry-summary">
-        <a href="#each_copy%28%26%29-instance-method" class="signature"><strong>#each_copy</strong>(&)</a>
+        <a href="#each_bytes%28%26%3ABytes%2CBytes-%3E%29-instance-method" class="signature"><strong>#each_bytes</strong>(& : Bytes, Bytes -> )</a>
         
-          <div class="summary"><p>Iterates over each FASTA record, yielding name and sequence as String copies.</p></div>
+          <div class="summary"><p>Iterates over each FASTA record, yielding name and sequence as borrowed <code>Bytes</code> (<code>Slice(UInt8)</code>).</p></div>
         
       </li>
     
@@ -367,7 +367,7 @@ Automatically detects gzip compression from .gz extension.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/18ab4ffa9e3d7a7b620150e5f0301d156127561d/src/fastx/fasta/reader.cr#L30" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/b9fcd6589ba2d7b8148d29ae6042ad93a22a5555/src/fastx/fasta/reader.cr#L31" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -389,7 +389,7 @@ IO-based readers do not perform gzip auto-detection.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/18ab4ffa9e3d7a7b620150e5f0301d156127561d/src/fastx/fasta/reader.cr#L40" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/b9fcd6589ba2d7b8148d29ae6042ad93a22a5555/src/fastx/fasta/reader.cr#L41" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -422,7 +422,7 @@ IO-based readers do not perform gzip auto-detection.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/18ab4ffa9e3d7a7b620150e5f0301d156127561d/src/fastx/fasta/reader.cr#L13" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/b9fcd6589ba2d7b8148d29ae6042ad93a22a5555/src/fastx/fasta/reader.cr#L14" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -443,7 +443,7 @@ IO-based readers do not perform gzip auto-detection.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/18ab4ffa9e3d7a7b620150e5f0301d156127561d/src/fastx/fasta/reader.cr#L21" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/b9fcd6589ba2d7b8148d29ae6042ad93a22a5555/src/fastx/fasta/reader.cr#L22" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -478,7 +478,7 @@ IO-based readers do not perform gzip auto-detection.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/18ab4ffa9e3d7a7b620150e5f0301d156127561d/src/fastx/fasta/reader.cr#L64" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/b9fcd6589ba2d7b8148d29ae6042ad93a22a5555/src/fastx/fasta/reader.cr#L71" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -499,50 +499,55 @@ IO-based readers do not perform gzip auto-detection.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/18ab4ffa9e3d7a7b620150e5f0301d156127561d/src/fastx/fasta/reader.cr#L72" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/b9fcd6589ba2d7b8148d29ae6042ad93a22a5555/src/fastx/fasta/reader.cr#L79" target="_blank">View source</a>]
         
       </div>
     </div>
   
-    <div class="entry-detail" id="each(&amp;)-instance-method">
+    <div class="entry-detail" id="each(&amp;:String,String-&gt;)-instance-method">
       <div class="signature">
         
-        def <strong>each</strong>(&)
+        def <strong>each</strong>(& : String, String -> )
 
-        <a class="method-permalink" href="#each%28%26%29-instance-method">#</a>
+        <a class="method-permalink" href="#each%28%26%3AString%2CString-%3E%29-instance-method">#</a>
       </div>
       
         <div class="doc">
           
-          <p>Iterates over each FASTA record, yielding name and sequence.
-This method reuses its internal sequence buffer until the next iteration.</p>
+          <p>Iterates over each FASTA record, yielding name and sequence as owned
+<code>String</code> copies that remain valid after iteration.</p>
         </div>
       
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/18ab4ffa9e3d7a7b620150e5f0301d156127561d/src/fastx/fasta/reader.cr#L48" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/b9fcd6589ba2d7b8148d29ae6042ad93a22a5555/src/fastx/fasta/reader.cr#L49" target="_blank">View source</a>]
         
       </div>
     </div>
   
-    <div class="entry-detail" id="each_copy(&amp;)-instance-method">
+    <div class="entry-detail" id="each_bytes(&amp;:Bytes,Bytes-&gt;)-instance-method">
       <div class="signature">
         
-        def <strong>each_copy</strong>(&)
+        def <strong>each_bytes</strong>(& : Bytes, Bytes -> )
 
-        <a class="method-permalink" href="#each_copy%28%26%29-instance-method">#</a>
+        <a class="method-permalink" href="#each_bytes%28%26%3ABytes%2CBytes-%3E%29-instance-method">#</a>
       </div>
       
         <div class="doc">
           
-          <p>Iterates over each FASTA record, yielding name and sequence as String copies.</p>
+          <p>Iterates over each FASTA record, yielding name and sequence as borrowed
+<code>Bytes</code> (<code>Slice(UInt8)</code>).</p>
+<p>The yielded slices point into internal buffers that are reused on every
+iteration: they are only valid until the next record is read. To keep a
+value beyond the current iteration, copy it (<code>String.new(bytes)</code> or <code>bytes.dup</code>)
+or use <code><a href="../../Fastx/Fasta/Reader.html#each%28%26%3AString%2CString-%3E%29-instance-method">#each</a></code>.</p>
         </div>
       
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/18ab4ffa9e3d7a7b620150e5f0301d156127561d/src/fastx/fasta/reader.cr#L56" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/b9fcd6589ba2d7b8148d29ae6042ad93a22a5555/src/fastx/fasta/reader.cr#L63" target="_blank">View source</a>]
         
       </div>
     </div>
