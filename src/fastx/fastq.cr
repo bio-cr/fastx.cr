@@ -52,14 +52,10 @@ module Fastx
     encode_phred(quality.to_slice, offset)
   end
 
-  # Converts an array of Phred scores to a quality string.
+  # Converts a slice of Phred scores to a quality string.
   def self.decode_phred(scores : Bytes, offset = 33) : String
     String.new(scores.size) do |buffer|
-      index = 0
-      while index < scores.size
-        buffer[index] = (scores[index] + offset).to_u8
-        index += 1
-      end
+      scores.each_with_index { |score, i| buffer[i] = (score + offset).to_u8 }
       {scores.size, scores.size}
     end
   end
@@ -67,11 +63,7 @@ module Fastx
   # Converts an array of Phred scores to a quality string.
   def self.decode_phred(scores : Array(UInt8), offset = 33) : String
     String.new(scores.size) do |buffer|
-      index = 0
-      while index < scores.size
-        buffer[index] = (scores.unsafe_fetch(index) + offset).to_u8
-        index += 1
-      end
+      scores.each_with_index { |score, i| buffer[i] = (score + offset).to_u8 }
       {scores.size, scores.size}
     end
   end

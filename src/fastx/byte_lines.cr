@@ -27,11 +27,8 @@ module Fastx
       count = @size - @start
       return if count <= 0
 
-      buffer = @buffer.to_unsafe
-      found = LibC.memchr(buffer + @start, 0x0A, count)
-      return if found.null?
-
-      (found.as(UInt8*) - buffer).to_i
+      relative = @buffer[@start, count].index(0x0Au8)
+      relative ? @start + relative : nil
     end
 
     private def final_line : Bytes?
@@ -51,14 +48,14 @@ module Fastx
     private def refill
       remaining = @size - @start
       if @start > 0
-        @buffer.move_from(@buffer[@start, remaining].to_unsafe, remaining) if remaining > 0
+        @buffer[@start, remaining].move_to(@buffer) if remaining > 0
         @start = 0
         @size = remaining
       end
 
       if @size == @buffer.size
         new_buffer = Bytes.new(@buffer.size * 2)
-        new_buffer.copy_from(@buffer.to_unsafe, @size)
+        @buffer.copy_to(new_buffer)
         @buffer = new_buffer
       end
 
