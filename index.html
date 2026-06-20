@@ -77,6 +77,11 @@
       
     </li>
   
+  <li class=" " data-id="fastx/Fastx/Fasta/SequenceLines" data-name="fastx::fasta::sequencelines">
+      <a href="Fastx/Fasta/SequenceLines.html">SequenceLines</a>
+      
+    </li>
+  
   <li class=" " data-id="fastx/Fastx/Fasta/Writer" data-name="fastx::fasta::writer">
       <a href="Fastx/Fasta/Writer.html">Writer</a>
       
@@ -97,8 +102,18 @@
       
     </li>
   
+  <li class=" " data-id="fastx/Fastx/Fastq/QualityLines" data-name="fastx::fastq::qualitylines">
+      <a href="Fastx/Fastq/QualityLines.html">QualityLines</a>
+      
+    </li>
+  
   <li class=" " data-id="fastx/Fastx/Fastq/Reader" data-name="fastx::fastq::reader">
       <a href="Fastx/Fastq/Reader.html">Reader</a>
+      
+    </li>
+  
+  <li class=" " data-id="fastx/Fastx/Fastq/SequenceLines" data-name="fastx::fastq::sequencelines">
+      <a href="Fastx/Fastq/SequenceLines.html">SequenceLines</a>
       
     </li>
   
@@ -211,6 +226,17 @@ iteration with borrowed <code>Bytes</code>:</p>
     puts <span class="s">&quot;</span><span class="i">#{</span><span class="t">String</span>.new(header)<span class="i">}</span><span class="s">\t</span><span class="i">#{</span>sequence.size<span class="i">}</span><span class="s">&quot;</span>
   <span class="k">end</span>
 <span class="k">end</span></code></pre>
+<p>For large genomes you can stream each record line by line with
+<code>#each_record_lines</code>, which never accumulates the full sequence in memory:</p>
+<pre><code class="language-crystal"><span class="t">Fastx</span><span class="t">::</span><span class="t">Fasta</span><span class="t">::</span><span class="t">Reader</span>.open(<span class="s">&quot;genome.fa&quot;</span>) <span class="k">do</span> <span class="o">|</span>reader<span class="o">|</span>
+  reader.each_record_lines <span class="k">do</span> <span class="o">|</span>name, lines<span class="o">|</span>
+    length <span class="o">=</span> <span class="n">0</span>
+    lines.each <span class="k">do</span> <span class="o">|</span>line<span class="o">|</span> <span class="c"># line is borrowed Bytes, valid until the next line</span>
+      length <span class="o">+=</span> line.size
+    <span class="k">end</span>
+    puts <span class="s">&quot;</span><span class="i">#{</span>name<span class="i">}</span><span class="s">\t</span><span class="i">#{</span>length<span class="i">}</span><span class="s">&quot;</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre>
 <h2><a id="read-fastq" class="anchor" href="#read-fastq">
   <svg class="octicon-link" aria-hidden="true">
     <use href="#octicon-link"/>
@@ -226,6 +252,17 @@ iteration with borrowed <code>Bytes</code>:</p>
   reader.each_bytes <span class="k">do</span> <span class="o">|</span>identifier, sequence, quality<span class="o">|</span>
     <span class="c"># All three are borrowed Bytes, valid only until the next iteration.</span>
     puts <span class="s">&quot;</span><span class="i">#{</span><span class="t">String</span>.new(identifier)<span class="i">}</span><span class="s">\t</span><span class="i">#{</span>sequence.size<span class="i">}</span><span class="s">\t</span><span class="i">#{</span>quality.size<span class="i">}</span><span class="s">&quot;</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre>
+<p><code>#each_record_lines</code> streams each record's sequence and quality line by line.
+The quality field ends once its length matches the sequence, so the sequence
+stream is consumed before quality (automatically, if you skip it):</p>
+<pre><code class="language-crystal"><span class="t">Fastx</span><span class="t">::</span><span class="t">Fastq</span><span class="t">::</span><span class="t">Reader</span>.open(<span class="s">&quot;long_reads.fq&quot;</span>) <span class="k">do</span> <span class="o">|</span>reader<span class="o">|</span>
+  reader.each_record_lines <span class="k">do</span> <span class="o">|</span>identifier, sequence, quality<span class="o">|</span>
+    seq_len <span class="o">=</span> <span class="n">0</span>
+    sequence.each { <span class="o">|</span>line<span class="o">|</span> seq_len <span class="o">+=</span> line.size }
+    quality.each { <span class="o">|</span>line<span class="o">|</span> process(line) } <span class="c"># borrowed Bytes, copy to retain</span>
+    puts <span class="s">&quot;</span><span class="i">#{</span>identifier<span class="i">}</span><span class="s">\t</span><span class="i">#{</span>seq_len<span class="i">}</span><span class="s">&quot;</span>
   <span class="k">end</span>
 <span class="k">end</span></code></pre>
 <h2><a id="write-fasta" class="anchor" href="#write-fasta">
@@ -287,11 +324,11 @@ puts io.to_s</code></pre>
 <ul>
 <li><code>Reader#each</code> yields owned <code>String</code> values you can store safely.</li>
 <li><code>Reader#each_bytes</code> yields borrowed <code>Bytes</code> (<code>Slice(UInt8)</code>) and reuses internal buffers for performance.</li>
-<li>Values yielded by <code>#each_bytes</code> are only valid until the next iteration; copy them (<code>String.new(bytes)</code> / <code>bytes.dup</code>) to retain them.</li>
+<li><code>Reader#each_record_lines</code> streams each record line by line as borrowed <code>Bytes</code> without accumulating the full sequence (FASTQ also exposes the quality lines).</li>
+<li>Values yielded by <code>#each_bytes</code> / <code>#each_record_lines</code> are only valid until the next iteration; copy them (<code>String.new(bytes)</code> / <code>bytes.dup</code>) to retain them.</li>
 <li>Readers are one-pass. Create a new reader to read again.</li>
 <li>Reader and writer instances are not thread-safe.</li>
-<li><code><a href="Fastx/Fastq/Reader.html">Fastx::Fastq::Reader</a></code> currently supports four-line FASTQ records only.</li>
-<li>Multi-line FASTQ is not supported.</li>
+<li><code>Fastx::Fastq::Reader#each</code> / <code>#each_bytes</code> support four-line FASTQ records only. <code>#each_record_lines</code> also handles multi-line (wrapped) FASTA and FASTQ.</li>
 <li>FASTQ reader and writer validate sequence/quality length equality.</li>
 </ul>
 <h2><a id="base-encoding" class="anchor" href="#base-encoding">

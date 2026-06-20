@@ -77,6 +77,11 @@
       
     </li>
   
+  <li class=" " data-id="fastx/Fastx/Fasta/SequenceLines" data-name="fastx::fasta::sequencelines">
+      <a href="../../Fastx/Fasta/SequenceLines.html">SequenceLines</a>
+      
+    </li>
+  
   <li class=" " data-id="fastx/Fastx/Fasta/Writer" data-name="fastx::fasta::writer">
       <a href="../../Fastx/Fasta/Writer.html">Writer</a>
       
@@ -97,8 +102,18 @@
       
     </li>
   
+  <li class=" " data-id="fastx/Fastx/Fastq/QualityLines" data-name="fastx::fastq::qualitylines">
+      <a href="../../Fastx/Fastq/QualityLines.html">QualityLines</a>
+      
+    </li>
+  
   <li class=" current" data-id="fastx/Fastx/Fastq/Reader" data-name="fastx::fastq::reader">
       <a href="../../Fastx/Fastq/Reader.html">Reader</a>
+      
+    </li>
+  
+  <li class=" " data-id="fastx/Fastx/Fastq/SequenceLines" data-name="fastx::fastq::sequencelines">
+      <a href="../../Fastx/Fastq/SequenceLines.html">SequenceLines</a>
       
     </li>
   
@@ -198,7 +213,7 @@
   </h2>
   
     
-      <a href="https://github.com/bio-cr/fastx.cr/blob/01b2fd44198bf9b91bbda5c893d4265cbc6ff2cc/src/fastx/fastq/reader.cr#L7" target="_blank">
+      <a href="https://github.com/bio-cr/fastx.cr/blob/ef331515d308ea52f4e3ad2afc354a1605428d32/src/fastx/fastq/reader.cr#L138" target="_blank">
         fastx/fastq/reader.cr
       </a>
     
@@ -306,6 +321,13 @@
         
       </li>
     
+      <li class="entry-summary">
+        <a href="#each_record_lines%28%26%3AString%2CSequenceLines%2CQualityLines-%3E%29-instance-method" class="signature"><strong>#each_record_lines</strong>(& : String, SequenceLines, QualityLines -> )</a>
+        
+          <div class="summary"><p>Iterates over FASTQ records while streaming each record's sequence and quality lines without accumulating the full fields in memory.</p></div>
+        
+      </li>
+    
   </ul>
 
 
@@ -367,7 +389,7 @@ Automatically detects gzip compression from .gz extension.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/01b2fd44198bf9b91bbda5c893d4265cbc6ff2cc/src/fastx/fastq/reader.cr#L31" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/ef331515d308ea52f4e3ad2afc354a1605428d32/src/fastx/fastq/reader.cr#L162" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -389,7 +411,7 @@ IO-based readers do not perform gzip auto-detection.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/01b2fd44198bf9b91bbda5c893d4265cbc6ff2cc/src/fastx/fastq/reader.cr#L41" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/ef331515d308ea52f4e3ad2afc354a1605428d32/src/fastx/fastq/reader.cr#L172" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -422,7 +444,7 @@ IO-based readers do not perform gzip auto-detection.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/01b2fd44198bf9b91bbda5c893d4265cbc6ff2cc/src/fastx/fastq/reader.cr#L14" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/ef331515d308ea52f4e3ad2afc354a1605428d32/src/fastx/fastq/reader.cr#L145" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -443,7 +465,7 @@ IO-based readers do not perform gzip auto-detection.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/01b2fd44198bf9b91bbda5c893d4265cbc6ff2cc/src/fastx/fastq/reader.cr#L22" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/ef331515d308ea52f4e3ad2afc354a1605428d32/src/fastx/fastq/reader.cr#L153" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -478,7 +500,7 @@ IO-based readers do not perform gzip auto-detection.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/01b2fd44198bf9b91bbda5c893d4265cbc6ff2cc/src/fastx/fastq/reader.cr#L71" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/ef331515d308ea52f4e3ad2afc354a1605428d32/src/fastx/fastq/reader.cr#L235" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -499,7 +521,7 @@ IO-based readers do not perform gzip auto-detection.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/01b2fd44198bf9b91bbda5c893d4265cbc6ff2cc/src/fastx/fastq/reader.cr#L79" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/ef331515d308ea52f4e3ad2afc354a1605428d32/src/fastx/fastq/reader.cr#L243" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -521,7 +543,7 @@ as owned <code>String</code> copies that remain valid after iteration.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/01b2fd44198bf9b91bbda5c893d4265cbc6ff2cc/src/fastx/fastq/reader.cr#L49" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/ef331515d308ea52f4e3ad2afc354a1605428d32/src/fastx/fastq/reader.cr#L180" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -547,7 +569,38 @@ or use <code><a href="../../Fastx/Fastq/Reader.html#each%28%26%3AString%2CString
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/01b2fd44198bf9b91bbda5c893d4265cbc6ff2cc/src/fastx/fastq/reader.cr#L63" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/ef331515d308ea52f4e3ad2afc354a1605428d32/src/fastx/fastq/reader.cr#L194" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="each_record_lines(&amp;:String,SequenceLines,QualityLines-&gt;)-instance-method">
+      <div class="signature">
+        
+        def <strong>each_record_lines</strong>(& : String, <a href="../../Fastx/Fastq/SequenceLines.html">SequenceLines</a>, <a href="../../Fastx/Fastq/QualityLines.html">QualityLines</a> -> )
+
+        <a class="method-permalink" href="#each_record_lines%28%26%3AString%2CSequenceLines%2CQualityLines-%3E%29-instance-method">#</a>
+      </div>
+      
+        <div class="doc">
+          
+          <p>Iterates over FASTQ records while streaming each record's sequence and
+quality lines without accumulating the full fields in memory.</p>
+<p>The yielded identifier is an owned <code>String</code>. <code><a href="../../Fastx/Fastq/SequenceLines.html#each%28%26%3ABytes-%3E%29%3ANil-instance-method">SequenceLines#each</a></code> and
+<code><a href="../../Fastx/Fastq/QualityLines.html#each%28%26%3ABytes-%3E%29%3ANil-instance-method">QualityLines#each</a></code> yield borrowed <code>Bytes</code> slices into an internal buffer;
+each slice is only valid until the next line is read. Copy it
+(<code>String.new(bytes)</code> or <code>bytes.dup</code>) to keep it.</p>
+<p>The quality field ends once its accumulated length matches the sequence
+length, so the sequence stream is consumed before quality (automatically,
+if the caller skips it). Because the streams are not buffered, a
+sequence/quality length mismatch is detected while reading rather than
+up front.</p>
+        </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/ef331515d308ea52f4e3ad2afc354a1605428d32/src/fastx/fastq/reader.cr#L214" target="_blank">View source</a>]
         
       </div>
     </div>
