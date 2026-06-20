@@ -37,7 +37,7 @@ describe Fastx::Fasta::Writer do
     c = 0
     reader.each do |name, sequence|
       name.should eq ["chr1 1", "chr2 2"][c]
-      sequence.to_s.should eq [("A" * 10), ("C" * 9)][c]
+      sequence.should eq [("A" * 10), ("C" * 9)][c]
       c += 1
     end
     reader.close

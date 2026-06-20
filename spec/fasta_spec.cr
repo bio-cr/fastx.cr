@@ -7,12 +7,11 @@ describe Fastx::Fasta do
     reader.as(Fastx::Fasta::Reader).each do |name, sequence|
       name.should eq ["chr1 1", "chr2 2"][c]
       sequence.size.should eq [1000, 900][c]
-      s = sequence.to_s
-      s.starts_with?(
+      sequence.starts_with?(
         [CHR1_START,
          CHR2_START,
         ][c]).should be_true
-      s.ends_with?(
+      sequence.ends_with?(
         [CHR1_END,
          CHR2_END,
         ][c]).should be_true
@@ -27,9 +26,8 @@ describe Fastx::Fasta do
       reader.as(Fastx::Fasta::Reader).each do |name, sequence|
         name.should eq ["chr1 1", "chr2 2"][c]
         sequence.size.should eq [1000, 900][c]
-        s = sequence.to_s
-        s.starts_with?([CHR1_START, CHR2_START][c]).should be_true
-        s.ends_with?([CHR1_END, CHR2_END][c]).should be_true
+        sequence.starts_with?([CHR1_START, CHR2_START][c]).should be_true
+        sequence.ends_with?([CHR1_END, CHR2_END][c]).should be_true
         c += 1
       end
     end

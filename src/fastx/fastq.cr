@@ -38,13 +38,42 @@ module Fastx
     end
   end
 
-  # Converts a quality string to an array of Phred scores.
-  def self.encode_phred(quality : String, offset = 33) : Array(UInt8)
-    scores = Array(UInt8).new(quality.bytesize)
-    quality.to_slice.each do |byte|
+  # Converts a quality sequence (`Bytes`) to an array of Phred scores.
+  def self.encode_phred(quality : Bytes, offset = 33) : Array(UInt8)
+    scores = Array(UInt8).new(quality.size)
+    quality.each do |byte|
       scores << (byte - offset).to_u8
     end
     scores
+  end
+
+  # Converts a quality string to an array of Phred scores.
+  def self.encode_phred(quality : String, offset = 33) : Array(UInt8)
+    encode_phred(quality.to_slice, offset)
+  end
+
+  # Converts an array of Phred scores to a quality string.
+  def self.decode_phred(scores : Bytes, offset = 33) : String
+    String.new(scores.size) do |buffer|
+      index = 0
+      while index < scores.size
+        buffer[index] = (scores[index] + offset).to_u8
+        index += 1
+      end
+      {scores.size, scores.size}
+    end
+  end
+
+  # Converts an array of Phred scores to a quality string.
+  def self.decode_phred(scores : Array(UInt8), offset = 33) : String
+    String.new(scores.size) do |buffer|
+      index = 0
+      while index < scores.size
+        buffer[index] = (scores.unsafe_fetch(index) + offset).to_u8
+        index += 1
+      end
+      {scores.size, scores.size}
+    end
   end
 
   # Converts an array of Phred scores to a quality string.

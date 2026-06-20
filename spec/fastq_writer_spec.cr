@@ -37,8 +37,8 @@ describe Fastx::Fastq::Writer do
     c = 0
     reader.each do |id, sequence, quality|
       id.should eq ["chr1_106_509:0/1", "chr2_437_492:1/1"][c]
-      sequence.to_s.should eq [("A" * 10), ("C" * 9)][c]
-      quality.to_s.should eq [("5" * 10), ("!" * 9)][c]
+      sequence.should eq [("A" * 10), ("C" * 9)][c]
+      quality.should eq [("5" * 10), ("!" * 9)][c]
       c += 1
     end
     reader.close

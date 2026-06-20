@@ -1,4 +1,5 @@
 require "../exceptions"
+require "../byte_lines"
 require "compress/gzip"
 
 module Fastx
@@ -43,20 +44,26 @@ module Fastx
         @io = io
       end
 
-      # Iterates over each FASTQ record, yielding identifier, sequence, and quality.
-      # This method reuses internal buffers, so sequence and quality are only valid until the next iteration.
-      def each(&)
+      # Iterates over each FASTQ record, yielding identifier, sequence, and quality
+      # as owned `String` copies that remain valid after iteration.
+      def each(& : String, String, String ->)
         ensure_not_consumed!
         each_record do |identifier, sequence, quality|
-          yield identifier, sequence, quality
+          yield String.new(identifier), String.new(sequence), String.new(quality)
         end
       end
 
-      # Iterates over each FASTQ record, yielding identifier, sequence, and quality as String copies.
-      def each_copy(&)
+      # Iterates over each FASTQ record, yielding identifier, sequence, and quality
+      # as borrowed `Bytes` (`Slice(UInt8)`).
+      #
+      # The yielded slices point into internal buffers that are reused on every
+      # iteration: they are only valid until the next record is read. To keep a
+      # value beyond the current iteration, copy it (`String.new(bytes)` or `bytes.dup`)
+      # or use `#each`.
+      def each_bytes(& : Bytes, Bytes, Bytes ->)
         ensure_not_consumed!
         each_record do |identifier, sequence, quality|
-          yield identifier, sequence.to_s, quality.to_s
+          yield identifier, sequence, quality
         end
       end
 
@@ -79,56 +86,70 @@ module Fastx
       end
 
       private def each_record(&)
-        identifier = nil
+        identifier = IO::Memory.new
         sequence = IO::Memory.new
         quality = IO::Memory.new
+        lines = ByteLines.new(@io)
         next_field = FIELD::IDENTIFIER
+        line_number = 0
         quality_line_number = 0
+        has_record = false
 
-        @io.each_line.with_index(1) do |line, line_number|
+        while line = lines.next_line
+          line_number += 1
           case next_field
           when FIELD::IDENTIFIER
-            unless line.starts_with?("@")
-              raise InvalidFormatError.new(source_label, line_number, line, "Identifier line must start with '@'")
-            end
+            ensure_prefix!(line, 0x40u8, line_number, "Identifier line must start with '@'")
 
-            yield_record(identifier, sequence, quality, quality_line_number) do |id, seq, qual|
-              yield id, seq, qual
-            end unless identifier.nil?
-            identifier = line[1..-1]
+            if has_record
+              yield_record(identifier, sequence, quality, quality_line_number) do |id, seq, qual|
+                yield id, seq, qual
+              end
+            end
+            identifier.clear
+            identifier.write(line[1, line.size - 1])
             sequence.clear
             quality.clear
+            has_record = true
             next_field = FIELD::SEQUENCE
           when FIELD::SEQUENCE
-            unless line.ascii_only?
-              raise InvalidCharacterError.new(source_label, identifier, line)
-            end
-            sequence << line
+            append_ascii_line!(sequence, line, identifier)
             next_field = FIELD::PLUS
           when FIELD::PLUS
-            unless line.starts_with?("+")
-              raise InvalidFormatError.new(source_label, line_number, line, "Plus line must start with '+'")
-            end
+            ensure_prefix!(line, 0x2Bu8, line_number, "Plus line must start with '+'")
             next_field = FIELD::QUALITY
           when FIELD::QUALITY
-            unless line.ascii_only?
-              raise InvalidCharacterError.new(source_label, identifier, line)
-            end
-            quality << line
+            append_ascii_line!(quality, line, identifier)
             quality_line_number = line_number
             next_field = FIELD::IDENTIFIER
           end
         end
 
-        raise_incomplete_record_error(next_field, quality_line_number) unless next_field == FIELD::IDENTIFIER
-        yield_record(identifier, sequence, quality, quality_line_number) do |id, seq, qual|
-          yield id, seq, qual
-        end unless identifier.nil?
+        raise_incomplete_record_error(next_field, line_number) unless next_field == FIELD::IDENTIFIER
+        if has_record
+          yield_record(identifier, sequence, quality, quality_line_number) do |id, seq, qual|
+            yield id, seq, qual
+          end
+        end
       end
 
-      private def yield_record(identifier : String, sequence : IO::Memory, quality : IO::Memory, line_number : Int32, &)
+      private def ensure_prefix!(line : Bytes, prefix : UInt8, line_number : Int32, message : String)
+        return if line.size > 0 && line[0] == prefix
+
+        raise InvalidFormatError.new(source_label, line_number, String.new(line), message)
+      end
+
+      private def append_ascii_line!(buffer : IO::Memory, line : Bytes, identifier : IO::Memory)
+        line.each do |byte|
+          raise InvalidCharacterError.new(source_label, String.new(identifier.to_slice), String.new(line)) if byte > 0x7Fu8
+        end
+
+        buffer.write(line)
+      end
+
+      private def yield_record(identifier : IO::Memory, sequence : IO::Memory, quality : IO::Memory, line_number : Int32, &)
         validate_record!(sequence, quality, line_number)
-        yield identifier, sequence, quality
+        yield identifier.to_slice, sequence.to_slice, quality.to_slice
       end
 
       private def validate_record!(sequence : IO::Memory, quality : IO::Memory, line_number : Int32)

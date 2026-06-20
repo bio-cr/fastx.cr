@@ -7,9 +7,8 @@ describe Fastx::Fasta::Reader do
     reader.each do |name, sequence|
       name.should eq ["chr1 1", "chr2 2"][c]
       sequence.size.should eq [1000, 900][c]
-      s = sequence.to_s
-      s.starts_with?([CHR1_START, CHR2_START][c]).should be_true
-      s.ends_with?([CHR1_END, CHR2_END][c]).should be_true
+      sequence.starts_with?([CHR1_START, CHR2_START][c]).should be_true
+      sequence.ends_with?([CHR1_END, CHR2_END][c]).should be_true
       c += 1
     end
     reader.closed?.should be_false
@@ -23,9 +22,8 @@ describe Fastx::Fasta::Reader do
       reader.each do |name, sequence|
         name.should eq ["chr1 1", "chr2 2"][c]
         sequence.size.should eq [1000, 900][c]
-        s = sequence.to_s
-        s.starts_with?([CHR1_START, CHR2_START][c]).should be_true
-        s.ends_with?([CHR1_END, CHR2_END][c]).should be_true
+        sequence.starts_with?([CHR1_START, CHR2_START][c]).should be_true
+        sequence.ends_with?([CHR1_END, CHR2_END][c]).should be_true
         c += 1
       end
     end
@@ -37,9 +35,8 @@ describe Fastx::Fasta::Reader do
     reader.each do |name, sequence|
       name.should eq ["chr1 1", "chr2 2"][c]
       sequence.size.should eq [1000, 900][c]
-      s = sequence.to_s
-      s.starts_with?([CHR1_START, CHR2_START][c]).should be_true
-      s.ends_with?([CHR1_END, CHR2_END][c]).should be_true
+      sequence.starts_with?([CHR1_START, CHR2_START][c]).should be_true
+      sequence.ends_with?([CHR1_END, CHR2_END][c]).should be_true
       c += 1
     end
     reader.closed?.should be_false
@@ -61,46 +58,19 @@ describe Fastx::Fasta::Reader do
     tempfile.delete
   end
 
-  it "should read a fasta file with each_copy" do
+  it "should read a fasta file with each_bytes" do
     reader = Fastx::Fasta::Reader.new(Path[__DIR__, "fixtures/moo.fa"])
     c = 0
-    reader.each_copy do |name, sequence|
-      name.should eq ["chr1 1", "chr2 2"][c]
+
+    reader.each_bytes do |name, sequence|
+      name.should be_a(Bytes)
+      sequence.should be_a(Bytes)
+      String.new(name).should eq ["chr1 1", "chr2 2"][c]
       sequence.size.should eq [1000, 900][c]
-      sequence.should be_a(String)
-      sequence.starts_with?([CHR1_START, CHR2_START][c]).should be_true
-      sequence.ends_with?([CHR1_END, CHR2_END][c]).should be_true
       c += 1
     end
+
     reader.close
-  end
-
-  it "should open a fasta file with block using each_copy" do
-    Fastx::Fasta::Reader.open(Path[__DIR__, "fixtures/moo.fa"]) do |reader|
-      c = 0
-      reader.each_copy do |name, sequence|
-        name.should eq ["chr1 1", "chr2 2"][c]
-        sequence.size.should eq [1000, 900][c]
-        sequence.should be_a(String)
-        sequence.starts_with?([CHR1_START, CHR2_START][c]).should be_true
-        sequence.ends_with?([CHR1_END, CHR2_END][c]).should be_true
-        c += 1
-      end
-    end
-  end
-
-  it "should raise InvalidCharacterError for non-ASCII characters with each_copy" do
-    tempfile = File.tempfile("invalid.fa")
-    File.write(tempfile.path, ">test\nACGT\u{1F600}ACGT\n")
-
-    reader = Fastx::Fasta::Reader.new(tempfile.path)
-    expect_raises(Fastx::InvalidCharacterError) do
-      reader.each_copy do |_, _|
-        # This should raise an exception
-      end
-    end
-    reader.close
-    tempfile.delete
   end
 
   it "should support reading from IO::Memory" do
@@ -108,11 +78,23 @@ describe Fastx::Fasta::Reader do
     reader = Fastx::Fasta::Reader.new(io)
     records = [] of Tuple(String, String)
 
-    reader.each_copy do |name, sequence|
+    reader.each do |name, sequence|
       records << {name, sequence}
     end
 
     records.should eq([{"seq1", "ACGT"}, {"seq2", "TT"}])
+    reader.close
+  end
+
+  it "should read CRLF line endings" do
+    io = IO::Memory.new(">seq1\r\nAC\r\nGT\r\n")
+    reader = Fastx::Fasta::Reader.new(io)
+
+    reader.each do |name, sequence|
+      name.should eq "seq1"
+      sequence.should eq "ACGT"
+    end
+
     reader.close
   end
 

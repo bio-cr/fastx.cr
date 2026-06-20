@@ -42,13 +42,15 @@ Fastx::Fasta::Reader.open("reads.fa.gz") do |reader|
 end
 ```
 
-Use `#each_copy` if you need to keep records after the current iteration:
+`#each` yields owned `String` values. Use `#each_bytes` for lower-allocation
+iteration with borrowed `Bytes`:
 
 ```crystal
 Fastx::Fasta::Reader.open("reads.fa") do |reader|
-  reader.each_copy do |header, sequence|
-    stored_header = header
-    stored_sequence = sequence
+  reader.each_bytes do |header, sequence|
+    # header and sequence are borrowed Bytes (Slice(UInt8)),
+    # valid only until the next iteration.
+    puts "#{String.new(header)}\t#{sequence.size}"
   end
 end
 ```
@@ -63,14 +65,13 @@ Fastx::Fastq::Reader.open("reads.fq.gz") do |reader|
 end
 ```
 
-Use `#each_copy` if you need safe `String` copies:
+Use `#each_bytes` if you want borrowed `Bytes`:
 
 ```crystal
 Fastx::Fastq::Reader.open("reads.fq") do |reader|
-  reader.each_copy do |identifier, sequence, quality|
-    saved_id = identifier
-    saved_sequence = sequence
-    saved_quality = quality
+  reader.each_bytes do |identifier, sequence, quality|
+    # All three are borrowed Bytes, valid only until the next iteration.
+    puts "#{String.new(identifier)}\t#{sequence.size}\t#{quality.size}"
   end
 end
 ```
@@ -105,7 +106,7 @@ Path-based APIs auto-detect gzip from the filename. IO-based APIs do not.
 io = IO::Memory.new("@seq1\nACGT\n+\n!!!!\n")
 reader = Fastx::Fastq::Reader.new(io)
 
-reader.each_copy do |identifier, sequence, quality|
+reader.each do |identifier, sequence, quality|
   puts "#{identifier}\t#{sequence}\t#{quality}"
 end
 ```
@@ -139,9 +140,9 @@ end
 
 ## Behavior And Limits
 
-- `Reader#each` reuses internal buffers for performance.
-- Values yielded by `#each` are only valid until the next iteration.
-- Use `#each_copy` if you want values you can store safely.
+- `Reader#each` yields owned `String` values you can store safely.
+- `Reader#each_bytes` yields borrowed `Bytes` (`Slice(UInt8)`) and reuses internal buffers for performance.
+- Values yielded by `#each_bytes` are only valid until the next iteration; copy them (`String.new(bytes)` / `bytes.dup`) to retain them.
 - Readers are one-pass. Create a new reader to read again.
 - Reader and writer instances are not thread-safe.
 - `Fastx::Fastq::Reader` currently supports four-line FASTQ records only.

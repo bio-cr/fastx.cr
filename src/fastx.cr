@@ -90,20 +90,36 @@ module Fastx
     78u8 # N
   end
 
-  # Converts a DNA sequence (String or IO::Memory) to a UInt8 slice,
+  # Converts a DNA sequence (`Bytes` or `String`) to a UInt8 slice,
   # where each base is encoded as a single byte.
   # When iupac is true, supports IUPAC nucleotide codes (R, Y, S, W, K, M, B, D, H, V).
   # When iupac is false, only standard bases (A, C, G, T, N) are preserved.
   # Non-recognized characters are converted to N (78u8).
   # This representation is suitable for byte-wise or array processing.
-  def self.encode_bases(sequence : IO::Memory | String, *, iupac : Bool = false, strict : Bool = false) : Slice(UInt8)
-    sequence.to_slice.map do |byte|
+  def self.encode_bases(sequence : Bytes, *, iupac : Bool = false, strict : Bool = false) : Slice(UInt8)
+    sequence.map do |byte|
       normalize_base(byte, iupac: iupac, strict: strict)
     end
   end
 
+  # :ditto:
+  def self.encode_bases(sequence : String, *, iupac : Bool = false, strict : Bool = false) : Slice(UInt8)
+    encode_bases(sequence.to_slice, iupac: iupac, strict: strict)
+  end
+
+  # Converts a UInt8 array (ASCII codes) to a DNA string.
+  def self.decode_bases(bases : Bytes) : String
+    String.new(bases)
+  end
+
+  # Converts a UInt8 array (ASCII codes) to a DNA string.
+  def self.decode_bases(bases : Array(UInt8)) : String
+    String.new(Slice.new(bases.to_unsafe, bases.size))
+  end
+
   # Converts a UInt8 array (ASCII codes) to a DNA string.
   def self.decode_bases(bases : Enumerable(UInt8)) : String
-    bases.map(&.chr).join
+    bytes = bases.to_a
+    String.new(Slice.new(bytes.to_unsafe, bytes.size))
   end
 end

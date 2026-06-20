@@ -11,9 +11,8 @@ describe Fastx do
     reader.as(Fastx::Fasta::Reader).each do |name, sequence|
       name.should eq ["chr1 1", "chr2 2"][c]
       sequence.size.should eq [1000, 900][c]
-      s = sequence.to_s
-      s.starts_with?([CHR1_START, CHR2_START][c]).should be_true
-      s.ends_with?([CHR1_END, CHR2_END][c]).should be_true
+      sequence.starts_with?([CHR1_START, CHR2_START][c]).should be_true
+      sequence.ends_with?([CHR1_END, CHR2_END][c]).should be_true
       c += 1
     end
     reader.close
@@ -25,9 +24,8 @@ describe Fastx do
       reader.as(Fastx::Fasta::Reader).each do |name, sequence|
         name.should eq ["chr1 1", "chr2 2"][c]
         sequence.size.should eq [1000, 900][c]
-        s = sequence.to_s
-        s.starts_with?([CHR1_START, CHR2_START][c]).should be_true
-        s.ends_with?([CHR1_END, CHR2_END][c]).should be_true
+        sequence.starts_with?([CHR1_START, CHR2_START][c]).should be_true
+        sequence.ends_with?([CHR1_END, CHR2_END][c]).should be_true
         c += 1
       end
     end
@@ -40,10 +38,8 @@ describe Fastx do
       id.should eq ["chr1_106_509:0/1", "chr1_437_492:1/1"][c]
       sequence.size.should eq 100
       quality.size.should eq 100
-      s = sequence.to_s
-      s.should eq [FQ_SEQ_1, FQ_SEQ_2][c]
-      q = quality.to_s
-      q.should eq [FQ_QUAL_1, FQ_QUAL_2][c]
+      sequence.should eq [FQ_SEQ_1, FQ_SEQ_2][c]
+      quality.should eq [FQ_QUAL_1, FQ_QUAL_2][c]
       c += 1
     end
   end
@@ -55,10 +51,8 @@ describe Fastx do
         id.should eq ["chr1_106_509:0/1", "chr1_437_492:1/1"][c]
         sequence.size.should eq 100
         quality.size.should eq 100
-        s = sequence.to_s
-        s.should eq [FQ_SEQ_1, FQ_SEQ_2][c]
-        q = quality.to_s
-        q.should eq [FQ_QUAL_1, FQ_QUAL_2][c]
+        sequence.should eq [FQ_SEQ_1, FQ_SEQ_2][c]
+        quality.should eq [FQ_QUAL_1, FQ_QUAL_2][c]
         c += 1
       end
     end
@@ -98,7 +92,7 @@ describe Fastx do
     Fastx.open(tempfile.path, "r", Fastx::Format::FASTA) do |reader|
       reader.as(Fastx::Fasta::Reader).each do |name, sequence|
         name.should eq "test"
-        sequence.to_s.should eq "ACGT"
+        sequence.should eq "ACGT"
       end
     end
 
@@ -225,6 +219,28 @@ describe Fastx do
     result_mixed.should eq "ACGTRYN"
   end
 
+  it "should decode bases consistently as raw bytes" do
+    bytes = Bytes[65u8, 0xFFu8, 67u8]
+    expected = String.new(bytes)
+
+    Fastx.decode_bases(bytes).should eq expected
+    Fastx.decode_bases([65u8, 0xFFu8, 67u8]).should eq expected
+    Fastx.decode_bases([65u8, 0xFFu8, 67u8].each).should eq expected
+  end
+
+  it "should encode bases from Bytes input" do
+    # A Bytes slice (as yielded by Reader#each_bytes) produces the same result as a String
+    bytes = "AcGtRyN".to_slice
+    Fastx.encode_bases(bytes).should eq Fastx.encode_bases("AcGtRyN")
+    Fastx.encode_bases(bytes, iupac: true).should eq Fastx.encode_bases("AcGtRyN", iupac: true)
+  end
+
+  it "should encode phred scores from Bytes input" do
+    bytes = "IIIIHGF".to_slice
+    Fastx.encode_phred(bytes).should eq Fastx.encode_phred("IIIIHGF")
+    Fastx.encode_phred(bytes, 64).should eq Fastx.encode_phred("IIIIHGF", 64)
+  end
+
   it "should encode and decode phred scores (default offset 33)" do
     quality = "IIIIHGF"
     scores = Fastx.encode_phred(quality)
@@ -253,8 +269,8 @@ describe Fastx do
     Fastx.open(tempfile.path, "r", Fastx::Format::FASTQ) do |reader|
       reader.as(Fastx::Fastq::Reader).each do |id, sequence, quality|
         id.should eq "test"
-        sequence.to_s.should eq "ACGT"
-        quality.to_s.should eq "!!!!"
+        sequence.should eq "ACGT"
+        quality.should eq "!!!!"
       end
     end
 
