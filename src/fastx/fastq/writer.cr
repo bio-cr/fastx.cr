@@ -43,14 +43,14 @@ module Fastx
       # shorter, but it was clearly slower than generated overloads in a tight
       # --release benchmark, so keep the overloads and route them to the Bytes core.
       {% for types in [
-                       {String, String, String},
-                       {String, String, Bytes},
-                       {String, Bytes, String},
-                       {String, Bytes, Bytes},
-                       {Bytes, String, String},
-                       {Bytes, String, Bytes},
-                       {Bytes, Bytes, String},
-                     ] %}
+                        {String, String, String},
+                        {String, String, Bytes},
+                        {String, Bytes, String},
+                        {String, Bytes, Bytes},
+                        {Bytes, String, String},
+                        {Bytes, String, Bytes},
+                        {Bytes, Bytes, String},
+                      ] %}
         # Writes a FASTQ record with the given identifier, sequence, and quality.
         def write(identifier : {{types[0]}}, sequence : {{types[1]}}, quality : {{types[2]}})
           write(bytes(identifier), bytes(sequence), bytes(quality))
