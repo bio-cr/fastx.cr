@@ -39,6 +39,9 @@ module Fastx
         @io = io
       end
 
+      # This write path is performance-sensitive. A union-typed method would be
+      # shorter, but it was clearly slower than generated overloads in a tight
+      # --release benchmark, so keep the overloads and route them to the Bytes core.
       {% for types in [
                        {String, String, String},
                        {String, String, Bytes},

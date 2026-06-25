@@ -42,6 +42,9 @@ module Fastx
         @line_width = normalize_line_width(line_width)
       end
 
+      # This write path is performance-sensitive. A union-typed method would be
+      # shorter, but it was clearly slower than generated overloads in a tight
+      # --release benchmark, so keep the overloads and route them to the Bytes core.
       {% for types in [{String, String}, {String, Bytes}, {Bytes, String}] %}
         # Writes a FASTA record with the given name and sequence.
         def write(name : {{types[0]}}, sequence : {{types[1]}})
