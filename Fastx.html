@@ -211,77 +211,77 @@
   </h2>
   
     
-      <a href="https://github.com/bio-cr/fastx.cr/blob/e0f72641bc1a552dfdcf55acf532899aa5571f95/src/fastx.cr#L6" target="_blank">
+      <a href="https://github.com/bio-cr/fastx.cr/blob/9c55b18290985bbad64d0e8ca84d99b3fd307d9d/src/fastx.cr#L6" target="_blank">
         fastx.cr
       </a>
     
     <br/>
   
     
-      <a href="https://github.com/bio-cr/fastx.cr/blob/e0f72641bc1a552dfdcf55acf532899aa5571f95/src/fastx/byte_lines.cr#L1" target="_blank">
+      <a href="https://github.com/bio-cr/fastx.cr/blob/9c55b18290985bbad64d0e8ca84d99b3fd307d9d/src/fastx/byte_lines.cr#L1" target="_blank">
         fastx/byte_lines.cr
       </a>
     
     <br/>
   
     
-      <a href="https://github.com/bio-cr/fastx.cr/blob/e0f72641bc1a552dfdcf55acf532899aa5571f95/src/fastx/exceptions.cr#L1" target="_blank">
+      <a href="https://github.com/bio-cr/fastx.cr/blob/9c55b18290985bbad64d0e8ca84d99b3fd307d9d/src/fastx/exceptions.cr#L1" target="_blank">
         fastx/exceptions.cr
       </a>
     
     <br/>
   
     
-      <a href="https://github.com/bio-cr/fastx.cr/blob/e0f72641bc1a552dfdcf55acf532899aa5571f95/src/fastx/fasta.cr#L4" target="_blank">
+      <a href="https://github.com/bio-cr/fastx.cr/blob/9c55b18290985bbad64d0e8ca84d99b3fd307d9d/src/fastx/fasta.cr#L4" target="_blank">
         fastx/fasta.cr
       </a>
     
     <br/>
   
     
-      <a href="https://github.com/bio-cr/fastx.cr/blob/e0f72641bc1a552dfdcf55acf532899aa5571f95/src/fastx/fasta/reader.cr#L5" target="_blank">
+      <a href="https://github.com/bio-cr/fastx.cr/blob/9c55b18290985bbad64d0e8ca84d99b3fd307d9d/src/fastx/fasta/reader.cr#L5" target="_blank">
         fastx/fasta/reader.cr
       </a>
     
     <br/>
   
     
-      <a href="https://github.com/bio-cr/fastx.cr/blob/e0f72641bc1a552dfdcf55acf532899aa5571f95/src/fastx/fasta/writer.cr#L4" target="_blank">
+      <a href="https://github.com/bio-cr/fastx.cr/blob/9c55b18290985bbad64d0e8ca84d99b3fd307d9d/src/fastx/fasta/writer.cr#L4" target="_blank">
         fastx/fasta/writer.cr
       </a>
     
     <br/>
   
     
-      <a href="https://github.com/bio-cr/fastx.cr/blob/e0f72641bc1a552dfdcf55acf532899aa5571f95/src/fastx/fastq.cr#L4" target="_blank">
+      <a href="https://github.com/bio-cr/fastx.cr/blob/9c55b18290985bbad64d0e8ca84d99b3fd307d9d/src/fastx/fastq.cr#L4" target="_blank">
         fastx/fastq.cr
       </a>
     
     <br/>
   
     
-      <a href="https://github.com/bio-cr/fastx.cr/blob/e0f72641bc1a552dfdcf55acf532899aa5571f95/src/fastx/fastq/reader.cr#L5" target="_blank">
+      <a href="https://github.com/bio-cr/fastx.cr/blob/9c55b18290985bbad64d0e8ca84d99b3fd307d9d/src/fastx/fastq/reader.cr#L5" target="_blank">
         fastx/fastq/reader.cr
       </a>
     
     <br/>
   
     
-      <a href="https://github.com/bio-cr/fastx.cr/blob/e0f72641bc1a552dfdcf55acf532899aa5571f95/src/fastx/fastq/writer.cr#L4" target="_blank">
+      <a href="https://github.com/bio-cr/fastx.cr/blob/9c55b18290985bbad64d0e8ca84d99b3fd307d9d/src/fastx/fastq/writer.cr#L4" target="_blank">
         fastx/fastq/writer.cr
       </a>
     
     <br/>
   
     
-      <a href="https://github.com/bio-cr/fastx.cr/blob/e0f72641bc1a552dfdcf55acf532899aa5571f95/src/fastx/format.cr#L1" target="_blank">
+      <a href="https://github.com/bio-cr/fastx.cr/blob/9c55b18290985bbad64d0e8ca84d99b3fd307d9d/src/fastx/format.cr#L1" target="_blank">
         fastx/format.cr
       </a>
     
     <br/>
   
     
-      <a href="https://github.com/bio-cr/fastx.cr/blob/e0f72641bc1a552dfdcf55acf532899aa5571f95/src/fastx/version.cr#L1" target="_blank">
+      <a href="https://github.com/bio-cr/fastx.cr/blob/9c55b18290985bbad64d0e8ca84d99b3fd307d9d/src/fastx/version.cr#L1" target="_blank">
         fastx/version.cr
       </a>
     
@@ -301,6 +301,42 @@
     </h2>
   
   <dl>
+    
+      <dt class="entry-const" id="NORMALIZE_IUPAC_BASE">
+        <strong>NORMALIZE_IUPAC_BASE</strong> = <code><span class="k">begin</span>
+  table <span class="o">=</span> <span class="t">StaticArray</span>(<span class="t">UInt8</span>, <span class="n">256</span>).new(<span class="n">0_u8</span>)
+  table[<span class="n">82</span>] <span class="o">=</span> table[<span class="n">114</span>] <span class="o">=</span> <span class="n">82_u8</span>
+  table[<span class="n">89</span>] <span class="o">=</span> table[<span class="n">121</span>] <span class="o">=</span> <span class="n">89_u8</span>
+  table[<span class="n">83</span>] <span class="o">=</span> table[<span class="n">115</span>] <span class="o">=</span> <span class="n">83_u8</span>
+  table[<span class="n">87</span>] <span class="o">=</span> table[<span class="n">119</span>] <span class="o">=</span> <span class="n">87_u8</span>
+  table[<span class="n">75</span>] <span class="o">=</span> table[<span class="n">107</span>] <span class="o">=</span> <span class="n">75_u8</span>
+  table[<span class="n">77</span>] <span class="o">=</span> table[<span class="n">109</span>] <span class="o">=</span> <span class="n">77_u8</span>
+  table[<span class="n">66</span>] <span class="o">=</span> table[<span class="n">98</span>] <span class="o">=</span> <span class="n">66_u8</span>
+  table[<span class="n">68</span>] <span class="o">=</span> table[<span class="n">100</span>] <span class="o">=</span> <span class="n">68_u8</span>
+  table[<span class="n">72</span>] <span class="o">=</span> table[<span class="n">104</span>] <span class="o">=</span> <span class="n">72_u8</span>
+  table[<span class="n">86</span>] <span class="o">=</span> table[<span class="n">118</span>] <span class="o">=</span> <span class="n">86_u8</span>
+  table
+<span class="k">end</span></code>
+      </dt>
+      
+    
+      <dt class="entry-const" id="NORMALIZE_STANDARD_BASE">
+        <strong>NORMALIZE_STANDARD_BASE</strong> = <code><span class="k">begin</span>
+  table <span class="o">=</span> <span class="t">StaticArray</span>(<span class="t">UInt8</span>, <span class="n">256</span>).new(<span class="n">0_u8</span>)
+  table[<span class="n">65</span>] <span class="o">=</span> table[<span class="n">97</span>] <span class="o">=</span> <span class="n">65_u8</span>
+  table[<span class="n">67</span>] <span class="o">=</span> table[<span class="n">99</span>] <span class="o">=</span> <span class="n">67_u8</span>
+  table[<span class="n">71</span>] <span class="o">=</span> table[<span class="n">103</span>] <span class="o">=</span> <span class="n">71_u8</span>
+  table[<span class="n">84</span>] <span class="o">=</span> table[<span class="n">116</span>] <span class="o">=</span> <span class="n">84_u8</span>
+  table[<span class="n">78</span>] <span class="o">=</span> table[<span class="n">110</span>] <span class="o">=</span> <span class="n">78_u8</span>
+  table
+<span class="k">end</span></code>
+      </dt>
+      
+      <dd class="entry-const-doc">
+        <p>Base normalization runs once per input byte. Lookup tables avoid repeated
+branch checks and keep this hot path small.</p>
+      </dd>
+      
     
       <dt class="entry-const" id="VERSION">
         <strong>VERSION</strong> = <code><span class="o">{{</span> (<span class="s">`shards version /home/runner/work/fastx.cr/fastx.cr/src/fastx`</span>).chomp.stringify }}</code>
@@ -455,7 +491,7 @@
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/e0f72641bc1a552dfdcf55acf532899aa5571f95/src/fastx.cr#L111" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/9c55b18290985bbad64d0e8ca84d99b3fd307d9d/src/fastx.cr#L126" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -476,7 +512,7 @@
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/e0f72641bc1a552dfdcf55acf532899aa5571f95/src/fastx.cr#L116" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/9c55b18290985bbad64d0e8ca84d99b3fd307d9d/src/fastx.cr#L131" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -497,7 +533,7 @@
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/e0f72641bc1a552dfdcf55acf532899aa5571f95/src/fastx.cr#L121" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/9c55b18290985bbad64d0e8ca84d99b3fd307d9d/src/fastx.cr#L136" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -518,7 +554,7 @@
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/e0f72641bc1a552dfdcf55acf532899aa5571f95/src/fastx/fastq.cr#L56" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/9c55b18290985bbad64d0e8ca84d99b3fd307d9d/src/fastx/fastq.cr#L56" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -539,7 +575,7 @@
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/e0f72641bc1a552dfdcf55acf532899aa5571f95/src/fastx/fastq.cr#L64" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/9c55b18290985bbad64d0e8ca84d99b3fd307d9d/src/fastx/fastq.cr#L64" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -560,7 +596,7 @@
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/e0f72641bc1a552dfdcf55acf532899aa5571f95/src/fastx/fastq.cr#L72" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/9c55b18290985bbad64d0e8ca84d99b3fd307d9d/src/fastx/fastq.cr#L72" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -586,7 +622,7 @@ This representation is suitable for byte-wise or array processing.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/e0f72641bc1a552dfdcf55acf532899aa5571f95/src/fastx.cr#L99" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/9c55b18290985bbad64d0e8ca84d99b3fd307d9d/src/fastx.cr#L114" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -612,7 +648,7 @@ This representation is suitable for byte-wise or array processing.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/e0f72641bc1a552dfdcf55acf532899aa5571f95/src/fastx.cr#L106" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/9c55b18290985bbad64d0e8ca84d99b3fd307d9d/src/fastx.cr#L121" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -633,7 +669,7 @@ This representation is suitable for byte-wise or array processing.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/e0f72641bc1a552dfdcf55acf532899aa5571f95/src/fastx/fastq.cr#L42" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/9c55b18290985bbad64d0e8ca84d99b3fd307d9d/src/fastx/fastq.cr#L42" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -654,7 +690,7 @@ This representation is suitable for byte-wise or array processing.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/e0f72641bc1a552dfdcf55acf532899aa5571f95/src/fastx/fastq.cr#L51" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/9c55b18290985bbad64d0e8ca84d99b3fd307d9d/src/fastx/fastq.cr#L51" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -678,7 +714,7 @@ Non-recognized characters are converted to N (78u8).</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/e0f72641bc1a552dfdcf55acf532899aa5571f95/src/fastx.cr#L43" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/9c55b18290985bbad64d0e8ca84d99b3fd307d9d/src/fastx.cr#L71" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -700,7 +736,7 @@ Yields the appropriate Reader/Writer to the block and automatically closes it.</
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/e0f72641bc1a552dfdcf55acf532899aa5571f95/src/fastx.cr#L9" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/9c55b18290985bbad64d0e8ca84d99b3fd307d9d/src/fastx.cr#L36" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -722,7 +758,7 @@ Returns the appropriate Reader/Writer instance (manual close required).</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/e0f72641bc1a552dfdcf55acf532899aa5571f95/src/fastx.cr#L25" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/9c55b18290985bbad64d0e8ca84d99b3fd307d9d/src/fastx.cr#L52" target="_blank">View source</a>]
         
       </div>
     </div>
