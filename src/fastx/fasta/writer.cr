@@ -42,22 +42,31 @@ module Fastx
         @line_width = normalize_line_width(line_width)
       end
 
+      {% for types in [{String, String}, {String, Bytes}, {Bytes, String}] %}
+        # Writes a FASTA record with the given name and sequence.
+        def write(name : {{types[0]}}, sequence : {{types[1]}})
+          write(bytes(name), bytes(sequence))
+        end
+      {% end %}
+
       # Writes a FASTA record with the given name and sequence.
-      def write(name : String, sequence : String)
-        @io << '>' << name << '\n'
+      def write(name : Bytes, sequence : Bytes)
+        @io.write_byte(0x3Eu8) # '>'
+        @io.write(name)
+        @io.write_byte(0x0Au8)
 
         line_width = @line_width
         if line_width
-          bytes = sequence.to_slice
           start = 0
-          while start < bytes.size
-            chunk_size = Math.min(line_width, bytes.size - start)
-            @io.write(bytes[start, chunk_size])
-            @io << '\n'
+          while start < sequence.size
+            chunk_size = Math.min(line_width, sequence.size - start)
+            @io.write(sequence[start, chunk_size])
+            @io.write_byte(0x0Au8)
             start += chunk_size
           end
         else
-          @io << sequence << '\n'
+          @io.write(sequence)
+          @io.write_byte(0x0Au8)
         end
       end
 
@@ -72,6 +81,14 @@ module Fastx
       # Returns true if the file handle is closed.
       def closed?
         @io.closed?
+      end
+
+      private def bytes(value : String) : Bytes
+        value.to_slice
+      end
+
+      private def bytes(value : Bytes) : Bytes
+        value
       end
 
       private def normalize_line_width(line_width : Int32?) : Int32?

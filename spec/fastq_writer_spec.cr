@@ -57,6 +57,36 @@ describe Fastx::Fastq::Writer do
     tempfile.delete
   end
 
+  it "should reject byte records with mismatched sequence and quality lengths" do
+    io = IO::Memory.new
+    writer = Fastx::Fastq::Writer.new(io)
+
+    expect_raises(ArgumentError, /sequence and quality lengths differ/) do
+      writer.write("bad".to_slice, "ACGT".to_slice, "!!!".to_slice)
+    end
+
+    writer.close
+  end
+
+  it "should write a fastq record from bytes" do
+    io = IO::Memory.new
+    writer = Fastx::Fastq::Writer.new(io)
+    writer.write("test".to_slice, "ACGT".to_slice, "!!!!".to_slice)
+
+    io.to_s.should eq("@test\nACGT\n+\n!!!!\n")
+    writer.close
+  end
+
+  it "should write a fastq record from mixed string and bytes" do
+    io = IO::Memory.new
+    writer = Fastx::Fastq::Writer.new(io)
+    writer.write("test", "ACGT".to_slice, "!!!!".to_slice)
+    writer.write("test2".to_slice, "TGCA", "####")
+
+    io.to_s.should eq("@test\nACGT\n+\n!!!!\n@test2\nTGCA\n+\n####\n")
+    writer.close
+  end
+
   it "should support writing to IO::Memory" do
     io = IO::Memory.new
     writer = Fastx::Fastq::Writer.new(io)

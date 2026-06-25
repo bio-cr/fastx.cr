@@ -54,6 +54,25 @@ describe Fastx::Fasta::Writer do
     tempfile.delete
   end
 
+  it "should write a fasta record from bytes" do
+    io = IO::Memory.new
+    writer = Fastx::Fasta::Writer.new(io, line_width: 4)
+    writer.write("seq1".to_slice, "ACGTGG".to_slice)
+
+    io.to_s.should eq(">seq1\nACGT\nGG\n")
+    writer.close
+  end
+
+  it "should write a fasta record from mixed string and bytes" do
+    io = IO::Memory.new
+    writer = Fastx::Fasta::Writer.new(io)
+    writer.write("seq1", "ACGT".to_slice)
+    writer.write("seq2".to_slice, "TGCA")
+
+    io.to_s.should eq(">seq1\nACGT\n>seq2\nTGCA\n")
+    writer.close
+  end
+
   it "should support writing to IO::Memory" do
     io = IO::Memory.new
     writer = Fastx::Fasta::Writer.new(io, line_width: 3)

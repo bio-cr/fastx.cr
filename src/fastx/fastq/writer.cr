@@ -39,16 +39,36 @@ module Fastx
         @io = io
       end
 
+      {% for types in [
+                       {String, String, String},
+                       {String, String, Bytes},
+                       {String, Bytes, String},
+                       {String, Bytes, Bytes},
+                       {Bytes, String, String},
+                       {Bytes, String, Bytes},
+                       {Bytes, Bytes, String},
+                     ] %}
+        # Writes a FASTQ record with the given identifier, sequence, and quality.
+        def write(identifier : {{types[0]}}, sequence : {{types[1]}}, quality : {{types[2]}})
+          write(bytes(identifier), bytes(sequence), bytes(quality))
+        end
+      {% end %}
+
       # Writes a FASTQ record with the given identifier, sequence, and quality.
-      def write(identifier : String, sequence : String, quality : String)
-        unless sequence.bytesize == quality.bytesize
+      def write(identifier : Bytes, sequence : Bytes, quality : Bytes)
+        unless sequence.size == quality.size
           raise ArgumentError.new("sequence and quality lengths differ")
         end
 
-        @io << '@' << identifier << '\n'
-        @io << sequence << '\n'
-        @io << "+\n"
-        @io << quality << '\n'
+        @io.write_byte(0x40u8) # '@'
+        @io.write(identifier)
+        @io.write_byte(0x0Au8)
+        @io.write(sequence)
+        @io.write_byte(0x0Au8)
+        @io.write_byte(0x2Bu8) # '+'
+        @io.write_byte(0x0Au8)
+        @io.write(quality)
+        @io.write_byte(0x0Au8)
       end
 
       # Closes the file handle.
@@ -62,6 +82,14 @@ module Fastx
       # Returns true if the file handle is closed.
       def closed?
         @io.closed?
+      end
+
+      private def bytes(value : String) : Bytes
+        value.to_slice
+      end
+
+      private def bytes(value : Bytes) : Bytes
+        value
       end
     end
   end
