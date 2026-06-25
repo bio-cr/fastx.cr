@@ -54,4 +54,35 @@ describe Fastx::Fasta do
       .should eq(">chr1 1\nAAAAAAAAAA\n>chr2 2\nCCCCCCCCC\n")
     tempfile.delete
   end
+
+  it "should copy records from reader each_bytes to writer" do
+    tempfile = File.tempfile("copy.fa")
+
+    Fastx::Fasta::Reader.open(Path[__DIR__, "fixtures/moo.fa"]) do |reader|
+      Fastx::Fasta::Writer.open(tempfile.path) do |writer|
+        reader.each_bytes do |name, sequence|
+          writer.write(name, sequence)
+        end
+      end
+    end
+
+    copied = [] of Tuple(String, String)
+    Fastx::Fasta::Reader.open(tempfile.path) do |reader|
+      reader.each do |name, sequence|
+        copied << {name, sequence}
+      end
+    end
+
+    copied.size.should eq 2
+    copied[0][0].should eq "chr1 1"
+    copied[0][1].size.should eq 1000
+    copied[0][1].starts_with?(CHR1_START).should be_true
+    copied[0][1].ends_with?(CHR1_END).should be_true
+    copied[1][0].should eq "chr2 2"
+    copied[1][1].size.should eq 900
+    copied[1][1].starts_with?(CHR2_START).should be_true
+    copied[1][1].ends_with?(CHR2_END).should be_true
+  ensure
+    tempfile.try &.delete
+  end
 end

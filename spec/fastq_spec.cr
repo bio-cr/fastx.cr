@@ -50,4 +50,30 @@ describe Fastx::Fastq do
       .should eq("@chr1_106_509:0/1\nAAAAAAAAAA\n+\n5555555555\n@chr2_437_492:1/1\nCCCCCCCCC\n+\n!!!!!!!!!\n")
     tempfile.delete
   end
+
+  it "should copy records from reader each_bytes to writer" do
+    tempfile = File.tempfile("copy.fq")
+
+    Fastx::Fastq::Reader.open(Path[__DIR__, "fixtures/moo.fq"]) do |reader|
+      Fastx::Fastq::Writer.open(tempfile.path) do |writer|
+        reader.each_bytes do |id, sequence, quality|
+          writer.write(id, sequence, quality)
+        end
+      end
+    end
+
+    copied = [] of Tuple(String, String, String)
+    Fastx::Fastq::Reader.open(tempfile.path) do |reader|
+      reader.each do |id, sequence, quality|
+        copied << {id, sequence, quality}
+      end
+    end
+
+    copied.should eq [
+      {"chr1_106_509:0/1", FQ_SEQ_1, FQ_QUAL_1},
+      {"chr1_437_492:1/1", FQ_SEQ_2, FQ_QUAL_2},
+    ]
+  ensure
+    tempfile.try &.delete
+  end
 end
