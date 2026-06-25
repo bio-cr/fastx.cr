@@ -5,6 +5,6 @@ authors:
   - kojix2 <2xijok@gmail.com>
 
 description: |
-  FASTA/FASTQ reader and writer for Crystal
+  FASTA/FASTQ reader and writer for Crystal.
 
 license: MIT
