@@ -201,19 +201,17 @@ describe Fastx::Fastq::Reader do
     reader.close
   end
 
-  it "should stream multi-line fastq records with each_record_lines" do
+  it "should reject multi-line fastq records with each_record_lines" do
     io = IO::Memory.new("@m\nACGT\nACGT\n+\n!!!!\n!!!!\n@n\nGG\nCC\n+\n####\n")
     reader = Fastx::Fastq::Reader.new(io)
-    seqs = [] of String
-    quals = [] of String
 
-    reader.each_record_lines do |_, sequence, quality|
-      seqs << String.build { |builder| sequence.each { |line| builder.write(line) } }
-      quals << String.build { |builder| quality.each { |line| builder.write(line) } }
+    expect_raises(Fastx::InvalidFormatError, /Plus line must start with '\+'/) do
+      reader.each_record_lines do |_, sequence, quality|
+        sequence.each { |_| }
+        quality.each { |_| }
+      end
     end
 
-    seqs.should eq ["ACGTACGT", "GGCC"]
-    quals.should eq ["!!!!!!!!", "####"]
     reader.close
   end
 
@@ -230,8 +228,8 @@ describe Fastx::Fastq::Reader do
     reader.close
   end
 
-  it "should reconstruct quality even when sequence is not read first" do
-    io = IO::Memory.new("@a\nAC\nGT\n+\n!!\n##\n")
+  it "should reconstruct quality even when sequence is skipped" do
+    io = IO::Memory.new("@a\nACGT\n+\n!!!!\n")
     reader = Fastx::Fastq::Reader.new(io)
     qual = ""
 
@@ -239,7 +237,7 @@ describe Fastx::Fastq::Reader do
       qual = String.build { |builder| quality.each { |line| builder.write(line) } }
     end
 
-    qual.should eq "!!##"
+    qual.should eq "!!!!"
     reader.close
   end
 
@@ -247,7 +245,7 @@ describe Fastx::Fastq::Reader do
     io = IO::Memory.new("@a\nACGTACGT\n+\n!!!!\n")
     reader = Fastx::Fastq::Reader.new(io)
 
-    expect_raises(Fastx::InvalidFormatError, /Incomplete FASTQ record/) do
+    expect_raises(Fastx::InvalidFormatError, /sequence and quality lengths differ/) do
       reader.each_record_lines do |_, _, quality|
         quality.each { |_| }
       end
@@ -260,7 +258,7 @@ describe Fastx::Fastq::Reader do
     io = IO::Memory.new("@a\nACGT\n+\n!!!!!\n")
     reader = Fastx::Fastq::Reader.new(io)
 
-    expect_raises(Fastx::InvalidFormatError, /longer than sequence/) do
+    expect_raises(Fastx::InvalidFormatError, /sequence and quality lengths differ/) do
       reader.each_record_lines do |_, _, quality|
         quality.each { |_| }
       end

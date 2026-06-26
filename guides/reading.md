@@ -7,7 +7,7 @@ reader method by the shape of data you want:
 - `#each_bytes` yields borrowed `Bytes` for lower-allocation record iteration.
 - `#each_record_lines` streams sequence and quality lines without accumulating the full record fields.
 
-See [Streams and limits](streams.md) for lifetime and multi-line FASTQ details.
+See [Streams and limits](streams.md) for lifetime and FASTQ record-shape details.
 
 ## FASTA
 
@@ -69,9 +69,9 @@ Fastx::Fastq::Reader.open("reads.fq") do |reader|
 end
 ```
 
-`#each_record_lines` streams each record's sequence and quality line by line.
-The quality field ends once its length matches the sequence, so the sequence
-stream is consumed before quality automatically if you skip it:
+`#each_record_lines` streams the sequence line and quality line as borrowed
+`Bytes`. The sequence line is consumed before quality automatically if you skip
+it, so sequence/quality length equality can still be validated:
 
 ```crystal
 Fastx::Fastq::Reader.open("long_reads.fq") do |reader|
@@ -88,5 +88,4 @@ end
 
 Use `#each` for straightforward application code. Use `#each_bytes` for
 record-level processing where allocations matter. Use `#each_record_lines` when
-a full sequence or quality field may be too large to keep in memory, or when
-you need to handle wrapped FASTQ records.
+a full FASTA sequence or a FASTQ sequence/quality line may be too large to copy.

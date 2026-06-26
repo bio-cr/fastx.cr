@@ -4,50 +4,40 @@ require "compress/gzip"
 
 module Fastx
   module Fastq
-    # Coordinates streaming of a single FASTQ record's sequence and quality
-    # lines over a shared `ByteLines` scanner.
-    #
-    # A FASTQ record stores sequence and quality sequentially
-    # (`@id` / sequence lines / `+` / quality lines), and the quality field has
-    # no explicit terminator: it ends once the accumulated quality length equals
-    # the sequence length. The cursor therefore tracks both lengths and requires
-    # the sequence to be fully consumed before quality is read (it auto-drains
-    # the sequence if the caller skips it).
+    # Coordinates streaming of a conventional four-line FASTQ record over a
+    # shared `ByteLines` scanner.
     private class RecordCursor
       getter line_number : Int32
       getter sequence_length : Int32 = 0
       getter quality_length : Int32 = 0
-      getter? sequence_done : Bool = false
-      getter? quality_done : Bool = false
 
       def initialize(@lines : ByteLines, @id : String, @source_label : String, @line_number : Int32)
+        @sequence_read = false
+        @plus_read = false
+        @quality_read = false
       end
 
-      # Returns the next sequence line, or `nil` once the `+` separator is
-      # reached (the separator is consumed).
+      # Returns the sequence line once, then `nil`.
       def next_sequence_line : Bytes?
-        return if @sequence_done
+        return if @sequence_read
+        @sequence_read = true
 
         line = @lines.next_line
-        raise_incomplete("'+' separator") if line.nil?
+        raise_incomplete("sequence") if line.nil?
         @line_number += 1
-
-        if line.size > 0 && line[0] == 0x2Bu8 # '+'
-          @sequence_done = true
-          return
-        end
 
         validate_ascii!(line)
         @sequence_length += line.size
         line
       end
 
-      # Returns the next quality line, or `nil` once the accumulated quality
-      # length reaches the sequence length. Auto-drains the sequence first so the
-      # target length is known even if the caller skipped the sequence stream.
+      # Returns the quality line once, then `nil`. Auto-drains the sequence line
+      # first so the sequence length is known even if the caller skipped it.
       def next_quality_line : Bytes?
-        drain_sequence unless @sequence_done
-        return if @quality_done
+        drain_sequence unless @sequence_read
+        return if @quality_read
+        read_plus_line unless @plus_read
+        @quality_read = true
 
         line = @lines.next_line
         raise_incomplete("quality") if line.nil?
@@ -55,30 +45,20 @@ module Fastx
 
         validate_ascii!(line)
         @quality_length += line.size
-        if @quality_length >= @sequence_length
-          @quality_done = true
-          if @quality_length > @sequence_length
-            raise InvalidFormatError.new(
-              @source_label, @line_number, String.new(line),
-              "quality is longer than sequence: sequence=#{@sequence_length}, quality=#{@quality_length}"
-            )
-          end
-        end
+        validate_lengths!
         line
       end
 
       def drain_sequence : Nil
-        while next_sequence_line
-        end
+        next_sequence_line
       end
 
       # Consumes any unread sequence and quality lines, leaving the scanner
       # positioned at the next record. Also surfaces length-mismatch errors when
       # the caller did not read the streams to completion.
       def drain : Nil
-        drain_sequence unless @sequence_done
-        while next_quality_line
-        end
+        drain_sequence unless @sequence_read
+        next_quality_line unless @quality_read
       end
 
       private def validate_ascii!(line : Bytes) : Nil
@@ -90,6 +70,28 @@ module Fastx
       private def raise_incomplete(expected : String) : NoReturn
         raise InvalidFormatError.new(
           @source_label, @line_number, "", "Incomplete FASTQ record: expected #{expected}"
+        )
+      end
+
+      private def read_plus_line : Nil
+        line = @lines.next_line
+        raise_incomplete("'+' separator") if line.nil?
+        @line_number += 1
+        @plus_read = true
+
+        return if line.size > 0 && line[0] == 0x2Bu8
+
+        raise InvalidFormatError.new(@source_label, @line_number, String.new(line), "Plus line must start with '+'")
+      end
+
+      private def validate_lengths! : Nil
+        return if @sequence_length == @quality_length
+
+        raise InvalidFormatError.new(
+          @source_label,
+          @line_number,
+          "",
+          "sequence and quality lengths differ: sequence=#{@sequence_length}, quality=#{@quality_length}"
         )
       end
     end
@@ -116,8 +118,8 @@ module Fastx
 
     # Streams the quality lines of a single FASTQ record as borrowed `Bytes`.
     #
-    # The sequence stream is consumed first (automatically, if the caller skips
-    # it) so the quality field's length is known. Each yielded slice is only
+    # The sequence line is consumed first (automatically, if the caller skips
+    # it) so the quality length can be validated. Each yielded slice is only
     # valid until the next line is read; copy it to keep it.
     class QualityLines
       def initialize(@cursor : RecordCursor)
@@ -130,8 +132,7 @@ module Fastx
       end
 
       def drain : Nil
-        while @cursor.next_quality_line
-        end
+        @cursor.next_quality_line
       end
     end
 
@@ -198,19 +199,17 @@ module Fastx
         end
       end
 
-      # Iterates over FASTQ records while streaming each record's sequence and
-      # quality lines without accumulating the full fields in memory.
+      # Iterates over conventional four-line FASTQ records while streaming each
+      # record's sequence and quality lines without accumulating the full fields
+      # in memory.
       #
       # The yielded identifier is an owned `String`. `SequenceLines#each` and
       # `QualityLines#each` yield borrowed `Bytes` slices into an internal buffer;
       # each slice is only valid until the next line is read. Copy it
       # (`String.new(bytes)` or `bytes.dup`) to keep it.
       #
-      # The quality field ends once its accumulated length matches the sequence
-      # length, so the sequence stream is consumed before quality (automatically,
-      # if the caller skips it). Because the streams are not buffered, a
-      # sequence/quality length mismatch is detected while reading rather than
-      # up front.
+      # The sequence line is consumed before quality (automatically, if the
+      # caller skips it) so sequence/quality length equality can be validated.
       def each_record_lines(& : String, SequenceLines, QualityLines ->)
         ensure_not_consumed!
 

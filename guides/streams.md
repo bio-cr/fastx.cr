@@ -46,8 +46,7 @@ you do not want to accumulate an entire sequence or quality field.
 
 ## FASTQ Record Shapes
 
-`Fastx::Fastq::Reader#each` and `#each_bytes` support conventional four-line
-FASTQ records:
+All FASTQ reader methods support conventional four-line FASTQ records:
 
 ```text
 @read1
@@ -56,7 +55,7 @@ ACGT
 !!!!
 ```
 
-`Fastx::Fastq::Reader#each_record_lines` also handles wrapped FASTQ records:
+Wrapped FASTQ records are not supported:
 
 ```text
 @read1
@@ -67,8 +66,7 @@ ACGT
 !!!!
 ```
 
-For wrapped FASTQ, the quality field ends when its accumulated length matches
-the accumulated sequence length.
+Use an external normalizer first if you need to read wrapped FASTQ input.
 
 ## Reader Lifetime
 
