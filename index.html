@@ -192,24 +192,25 @@
     github: bio-cr/fastx.cr</code></pre>
 <p>Then run:</p>
 <pre><code class="language-sh">shards install</code></pre>
-<h2><a id="what-it-does" class="anchor" href="#what-it-does">
+<h2><a id="features" class="anchor" href="#features">
   <svg class="octicon-link" aria-hidden="true">
     <use href="#octicon-link"/>
   </svg>
-</a>What It Does</h2>
+</a>Features</h2>
 <ul>
-<li>Read FASTA</li>
-<li>Read FASTQ</li>
-<li>Write FASTA</li>
-<li>Write FASTQ</li>
+<li>Read and write FASTA</li>
+<li>Read and write FASTQ</li>
 <li>Auto-handle gzip when the path ends with <code>.gz</code></li>
-<li>Stream large files with low-allocation readers</li>
+<li>Iterate with owned <code>String</code> values or lower-allocation borrowed <code>Bytes</code></li>
+<li>Stream large records line by line without accumulating full sequences</li>
+<li>Encode/decode nucleotide bases and FASTQ quality scores</li>
 </ul>
-<h2><a id="read-fasta" class="anchor" href="#read-fasta">
+<h2><a id="quick-start" class="anchor" href="#quick-start">
   <svg class="octicon-link" aria-hidden="true">
     <use href="#octicon-link"/>
   </svg>
-</a>Read FASTA</h2>
+</a>Quick Start</h2>
+<p>Read FASTA:</p>
 <pre><code class="language-crystal"><span class="k">require</span> <span class="s">&quot;fastx&quot;</span>
 
 <span class="t">Fastx</span><span class="t">::</span><span class="t">Fasta</span><span class="t">::</span><span class="t">Reader</span>.open(<span class="s">&quot;reads.fa.gz&quot;</span>) <span class="k">do</span> <span class="o">|</span>reader<span class="o">|</span>
@@ -217,136 +218,32 @@
     puts <span class="s">&quot;</span><span class="i">#{</span>header<span class="i">}</span><span class="s">\t</span><span class="i">#{</span>sequence.bytesize<span class="i">}</span><span class="s">&quot;</span>
   <span class="k">end</span>
 <span class="k">end</span></code></pre>
-<p><code>#each</code> yields owned <code>String</code> values. Use <code>#each_bytes</code> for lower-allocation
-iteration with borrowed <code>Bytes</code>:</p>
-<pre><code class="language-crystal"><span class="t">Fastx</span><span class="t">::</span><span class="t">Fasta</span><span class="t">::</span><span class="t">Reader</span>.open(<span class="s">&quot;reads.fa&quot;</span>) <span class="k">do</span> <span class="o">|</span>reader<span class="o">|</span>
-  reader.each_bytes <span class="k">do</span> <span class="o">|</span>header, sequence<span class="o">|</span>
-    <span class="c"># header and sequence are borrowed Bytes (Slice(UInt8)),</span>
-    <span class="c"># valid only until the next iteration.</span>
-    puts <span class="s">&quot;</span><span class="i">#{</span><span class="t">String</span>.new(header)<span class="i">}</span><span class="s">\t</span><span class="i">#{</span>sequence.size<span class="i">}</span><span class="s">&quot;</span>
-  <span class="k">end</span>
-<span class="k">end</span></code></pre>
-<p>For large genomes you can stream each record line by line with
-<code>#each_record_lines</code>, which never accumulates the full sequence in memory:</p>
-<pre><code class="language-crystal"><span class="t">Fastx</span><span class="t">::</span><span class="t">Fasta</span><span class="t">::</span><span class="t">Reader</span>.open(<span class="s">&quot;genome.fa&quot;</span>) <span class="k">do</span> <span class="o">|</span>reader<span class="o">|</span>
-  reader.each_record_lines <span class="k">do</span> <span class="o">|</span>name, lines<span class="o">|</span>
-    length <span class="o">=</span> <span class="n">0</span>
-    lines.each <span class="k">do</span> <span class="o">|</span>line<span class="o">|</span> <span class="c"># line is borrowed Bytes, valid until the next line</span>
-      length <span class="o">+=</span> line.size
-    <span class="k">end</span>
-    puts <span class="s">&quot;</span><span class="i">#{</span>name<span class="i">}</span><span class="s">\t</span><span class="i">#{</span>length<span class="i">}</span><span class="s">&quot;</span>
-  <span class="k">end</span>
-<span class="k">end</span></code></pre>
-<h2><a id="read-fastq" class="anchor" href="#read-fastq">
-  <svg class="octicon-link" aria-hidden="true">
-    <use href="#octicon-link"/>
-  </svg>
-</a>Read FASTQ</h2>
+<p>Read FASTQ:</p>
 <pre><code class="language-crystal"><span class="t">Fastx</span><span class="t">::</span><span class="t">Fastq</span><span class="t">::</span><span class="t">Reader</span>.open(<span class="s">&quot;reads.fq.gz&quot;</span>) <span class="k">do</span> <span class="o">|</span>reader<span class="o">|</span>
   reader.each <span class="k">do</span> <span class="o">|</span>identifier, sequence, quality<span class="o">|</span>
     puts <span class="s">&quot;</span><span class="i">#{</span>identifier<span class="i">}</span><span class="s">\t</span><span class="i">#{</span>sequence.bytesize<span class="i">}</span><span class="s">\t</span><span class="i">#{</span>quality.bytesize<span class="i">}</span><span class="s">&quot;</span>
   <span class="k">end</span>
 <span class="k">end</span></code></pre>
-<p>Use <code>#each_bytes</code> if you want borrowed <code>Bytes</code>:</p>
-<pre><code class="language-crystal"><span class="t">Fastx</span><span class="t">::</span><span class="t">Fastq</span><span class="t">::</span><span class="t">Reader</span>.open(<span class="s">&quot;reads.fq&quot;</span>) <span class="k">do</span> <span class="o">|</span>reader<span class="o">|</span>
-  reader.each_bytes <span class="k">do</span> <span class="o">|</span>identifier, sequence, quality<span class="o">|</span>
-    <span class="c"># All three are borrowed Bytes, valid only until the next iteration.</span>
-    puts <span class="s">&quot;</span><span class="i">#{</span><span class="t">String</span>.new(identifier)<span class="i">}</span><span class="s">\t</span><span class="i">#{</span>sequence.size<span class="i">}</span><span class="s">\t</span><span class="i">#{</span>quality.size<span class="i">}</span><span class="s">&quot;</span>
-  <span class="k">end</span>
-<span class="k">end</span></code></pre>
-<p><code>#each_record_lines</code> streams each record's sequence and quality line by line.
-The quality field ends once its length matches the sequence, so the sequence
-stream is consumed before quality (automatically, if you skip it):</p>
-<pre><code class="language-crystal"><span class="t">Fastx</span><span class="t">::</span><span class="t">Fastq</span><span class="t">::</span><span class="t">Reader</span>.open(<span class="s">&quot;long_reads.fq&quot;</span>) <span class="k">do</span> <span class="o">|</span>reader<span class="o">|</span>
-  reader.each_record_lines <span class="k">do</span> <span class="o">|</span>identifier, sequence, quality<span class="o">|</span>
-    seq_len <span class="o">=</span> <span class="n">0</span>
-    sequence.each { <span class="o">|</span>line<span class="o">|</span> seq_len <span class="o">+=</span> line.size }
-    quality.each { <span class="o">|</span>line<span class="o">|</span> process(line) } <span class="c"># borrowed Bytes, copy to retain</span>
-    puts <span class="s">&quot;</span><span class="i">#{</span>identifier<span class="i">}</span><span class="s">\t</span><span class="i">#{</span>seq_len<span class="i">}</span><span class="s">&quot;</span>
-  <span class="k">end</span>
-<span class="k">end</span></code></pre>
-<h2><a id="write-fasta" class="anchor" href="#write-fasta">
-  <svg class="octicon-link" aria-hidden="true">
-    <use href="#octicon-link"/>
-  </svg>
-</a>Write FASTA</h2>
+<p>Write FASTA:</p>
 <pre><code class="language-crystal"><span class="t">Fastx</span><span class="t">::</span><span class="t">Fasta</span><span class="t">::</span><span class="t">Writer</span>.open(<span class="s">&quot;out.fa&quot;</span>, line_width: <span class="n">80</span>) <span class="k">do</span> <span class="o">|</span>writer<span class="o">|</span>
   writer.write(<span class="s">&quot;seq1&quot;</span>, <span class="s">&quot;ACGTACGT&quot;</span>)
-  writer.write(<span class="s">&quot;seq2&quot;</span>, <span class="s">&quot;TTTTCCCC&quot;</span>)
 <span class="k">end</span></code></pre>
-<p>Set <code>line_width: nil</code> to write one sequence line per record.</p>
-<h2><a id="write-fastq" class="anchor" href="#write-fastq">
-  <svg class="octicon-link" aria-hidden="true">
-    <use href="#octicon-link"/>
-  </svg>
-</a>Write FASTQ</h2>
+<p>Write FASTQ:</p>
 <pre><code class="language-crystal"><span class="t">Fastx</span><span class="t">::</span><span class="t">Fastq</span><span class="t">::</span><span class="t">Writer</span>.open(<span class="s">&quot;out.fq.gz&quot;</span>) <span class="k">do</span> <span class="o">|</span>writer<span class="o">|</span>
   writer.write(<span class="s">&quot;seq1&quot;</span>, <span class="s">&quot;ACGT&quot;</span>, <span class="s">&quot;!!!!&quot;</span>)
-  writer.write(<span class="s">&quot;seq2&quot;</span>, <span class="s">&quot;TTTT&quot;</span>, <span class="s">&quot;####&quot;</span>)
 <span class="k">end</span></code></pre>
-<p><code><a href="Fastx/Fastq/Writer.html">Fastx::Fastq::Writer</a></code> raises <code>ArgumentError</code> if sequence and quality lengths differ.</p>
-<h2><a id="use-existing-io" class="anchor" href="#use-existing-io">
+<h2><a id="guides" class="anchor" href="#guides">
   <svg class="octicon-link" aria-hidden="true">
     <use href="#octicon-link"/>
   </svg>
-</a>Use Existing IO</h2>
-<p>Path-based APIs auto-detect gzip from the filename. IO-based APIs do not.</p>
-<pre><code class="language-crystal">io <span class="o">=</span> <span class="t">IO</span><span class="t">::</span><span class="t">Memory</span>.new(<span class="s">&quot;@seq1\nACGT\n+\n!!!!\n&quot;</span>)
-reader <span class="o">=</span> <span class="t">Fastx</span><span class="t">::</span><span class="t">Fastq</span><span class="t">::</span><span class="t">Reader</span>.new(io)
-
-reader.each <span class="k">do</span> <span class="o">|</span>identifier, sequence, quality<span class="o">|</span>
-  puts <span class="s">&quot;</span><span class="i">#{</span>identifier<span class="i">}</span><span class="s">\t</span><span class="i">#{</span>sequence<span class="i">}</span><span class="s">\t</span><span class="i">#{</span>quality<span class="i">}</span><span class="s">&quot;</span>
-<span class="k">end</span></code></pre>
-<pre><code class="language-crystal">io <span class="o">=</span> <span class="t">IO</span><span class="t">::</span><span class="t">Memory</span>.new
-writer <span class="o">=</span> <span class="t">Fastx</span><span class="t">::</span><span class="t">Fasta</span><span class="t">::</span><span class="t">Writer</span>.new(io, line_width: <span class="n">4</span>)
-writer.write(<span class="s">&quot;seq1&quot;</span>, <span class="s">&quot;ACGTGG&quot;</span>)
-puts io.to_s</code></pre>
-<h2><a id="format-detection" class="anchor" href="#format-detection">
-  <svg class="octicon-link" aria-hidden="true">
-    <use href="#octicon-link"/>
-  </svg>
-</a>Format Detection</h2>
-<p><code>Fastx.open</code> is a convenience API based on file extension:</p>
-<pre><code class="language-crystal"><span class="t">Fastx</span>.open(<span class="s">&quot;reads.fa&quot;</span>) <span class="k">do</span> <span class="o">|</span>reader<span class="o">|</span>
-  reader.<span class="k">as</span>(<span class="t">Fastx</span><span class="t">::</span><span class="t">Fasta</span><span class="t">::</span><span class="t">Reader</span>).each <span class="k">do</span> <span class="o">|</span>header, sequence<span class="o">|</span>
-    puts <span class="s">&quot;</span><span class="i">#{</span>header<span class="i">}</span><span class="s">\t</span><span class="i">#{</span>sequence.bytesize<span class="i">}</span><span class="s">&quot;</span>
-  <span class="k">end</span>
-<span class="k">end</span></code></pre>
-<p>You can also pass the format explicitly:</p>
-<pre><code class="language-crystal"><span class="t">Fastx</span>.open(<span class="s">&quot;output&quot;</span>, <span class="s">&quot;w&quot;</span>, <span class="t">Fastx</span><span class="t">::</span><span class="t">Format</span><span class="t">::</span><span class="t">FASTQ</span>) <span class="k">do</span> <span class="o">|</span>writer<span class="o">|</span>
-  writer.<span class="k">as</span>(<span class="t">Fastx</span><span class="t">::</span><span class="t">Fastq</span><span class="t">::</span><span class="t">Writer</span>).write(<span class="s">&quot;seq1&quot;</span>, <span class="s">&quot;ACGT&quot;</span>, <span class="s">&quot;!!!!&quot;</span>)
-<span class="k">end</span></code></pre>
-<h2><a id="behavior-and-limits" class="anchor" href="#behavior-and-limits">
-  <svg class="octicon-link" aria-hidden="true">
-    <use href="#octicon-link"/>
-  </svg>
-</a>Behavior And Limits</h2>
+</a>Guides</h2>
 <ul>
-<li><code>Reader#each</code> yields owned <code>String</code> values you can store safely.</li>
-<li><code>Reader#each_bytes</code> yields borrowed <code>Bytes</code> (<code>Slice(UInt8)</code>) and reuses internal buffers for performance.</li>
-<li><code>Reader#each_record_lines</code> streams each record line by line as borrowed <code>Bytes</code> without accumulating the full sequence (FASTQ also exposes the quality lines).</li>
-<li>Values yielded by <code>#each_bytes</code> / <code>#each_record_lines</code> are only valid until the next iteration; copy them (<code>String.new(bytes)</code> / <code>bytes.dup</code>) to retain them.</li>
-<li>Readers are one-pass. Create a new reader to read again.</li>
-<li>Reader and writer instances are not thread-safe.</li>
-<li><code>Fastx::Fastq::Reader#each</code> / <code>#each_bytes</code> support four-line FASTQ records only. <code>#each_record_lines</code> also handles multi-line (wrapped) FASTA and FASTQ.</li>
-<li>FASTQ reader and writer validate sequence/quality length equality.</li>
+<li><a href="guide/getting-started.md">Getting started</a></li>
+<li><a href="guide/reading.md">Reading FASTA and FASTQ</a></li>
+<li><a href="guide/writing.md">Writing FASTA and FASTQ</a></li>
+<li><a href="guide/streams.md">Streams and limits</a></li>
+<li><a href="guide/encoding.md">Base and quality encoding</a></li>
 </ul>
-<h2><a id="base-encoding" class="anchor" href="#base-encoding">
-  <svg class="octicon-link" aria-hidden="true">
-    <use href="#octicon-link"/>
-  </svg>
-</a>Base Encoding</h2>
-<pre><code class="language-crystal">encoded <span class="o">=</span> <span class="t">Fastx</span>.encode_bases(<span class="s">&quot;AcGtNxyz&quot;</span>)
-decoded <span class="o">=</span> <span class="t">Fastx</span>.decode_bases(encoded)</code></pre>
-<p>Unknown bases are normalized to <code>N</code> by default. Use <code>strict: true</code> to raise:</p>
-<pre><code class="language-crystal"><span class="t">Fastx</span>.normalize_base(<span class="s">&#39;X&#39;</span>.ord.to_u8, strict: <span class="n">true</span>)</code></pre>
-<h2><a id="quality-encoding" class="anchor" href="#quality-encoding">
-  <svg class="octicon-link" aria-hidden="true">
-    <use href="#octicon-link"/>
-  </svg>
-</a>Quality Encoding</h2>
-<pre><code class="language-crystal">scores <span class="o">=</span> <span class="t">Fastx</span>.encode_phred(<span class="s">&quot;IIIIHGF&quot;</span>)
-quality <span class="o">=</span> <span class="t">Fastx</span>.decode_phred(scores)</code></pre>
 <h2><a id="license" class="anchor" href="#license">
   <svg class="octicon-link" aria-hidden="true">
     <use href="#octicon-link"/>
