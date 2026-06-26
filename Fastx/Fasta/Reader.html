@@ -208,7 +208,7 @@
   </h2>
   
     
-      <a href="https://github.com/bio-cr/fastx.cr/blob/9b66fc35223edb291a293682b35829ee72728eb0/src/fastx/fasta/reader.cr#L49" target="_blank">
+      <a href="https://github.com/bio-cr/fastx.cr/blob/442c5576c143ef243351237a6111c600c1b63036/src/fastx/fasta/reader.cr#L49" target="_blank">
         fastx/fasta/reader.cr
       </a>
     
@@ -291,7 +291,7 @@
       <li class="entry-summary">
         <a href="#close-instance-method" class="signature"><strong>#close</strong></a>
         
-          <div class="summary"><p>Closes the file handle.</p></div>
+          <div class="summary"><p>Closes the reader and its underlying IO.</p></div>
         
       </li>
     
@@ -384,7 +384,7 @@ Automatically detects gzip compression from .gz extension.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/9b66fc35223edb291a293682b35829ee72728eb0/src/fastx/fasta/reader.cr#L73" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/442c5576c143ef243351237a6111c600c1b63036/src/fastx/fasta/reader.cr#L73" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -400,13 +400,14 @@ Automatically detects gzip compression from .gz extension.</p>
         <div class="doc">
           
           <p>Creates a new FASTA reader for an already opened IO stream.
-IO-based readers do not perform gzip auto-detection.</p>
+IO-based readers do not perform gzip auto-detection. The reader takes
+ownership of the IO and closes it when the reader is closed.</p>
         </div>
       
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/9b66fc35223edb291a293682b35829ee72728eb0/src/fastx/fasta/reader.cr#L83" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/442c5576c143ef243351237a6111c600c1b63036/src/fastx/fasta/reader.cr#L84" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -439,7 +440,7 @@ IO-based readers do not perform gzip auto-detection.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/9b66fc35223edb291a293682b35829ee72728eb0/src/fastx/fasta/reader.cr#L56" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/442c5576c143ef243351237a6111c600c1b63036/src/fastx/fasta/reader.cr#L56" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -460,7 +461,7 @@ IO-based readers do not perform gzip auto-detection.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/9b66fc35223edb291a293682b35829ee72728eb0/src/fastx/fasta/reader.cr#L64" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/442c5576c143ef243351237a6111c600c1b63036/src/fastx/fasta/reader.cr#L64" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -489,13 +490,13 @@ IO-based readers do not perform gzip auto-detection.</p>
       
         <div class="doc">
           
-          <p>Closes the file handle.</p>
+          <p>Closes the reader and its underlying IO.</p>
         </div>
       
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/9b66fc35223edb291a293682b35829ee72728eb0/src/fastx/fasta/reader.cr#L146" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/442c5576c143ef243351237a6111c600c1b63036/src/fastx/fasta/reader.cr#L149" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -516,7 +517,7 @@ IO-based readers do not perform gzip auto-detection.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/9b66fc35223edb291a293682b35829ee72728eb0/src/fastx/fasta/reader.cr#L154" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/442c5576c143ef243351237a6111c600c1b63036/src/fastx/fasta/reader.cr#L157" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -538,7 +539,7 @@ IO-based readers do not perform gzip auto-detection.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/9b66fc35223edb291a293682b35829ee72728eb0/src/fastx/fasta/reader.cr#L91" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/442c5576c143ef243351237a6111c600c1b63036/src/fastx/fasta/reader.cr#L92" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -556,15 +557,16 @@ IO-based readers do not perform gzip auto-detection.</p>
           <p>Iterates over each FASTA record, yielding name and sequence as borrowed
 <code>Bytes</code> (<code>Slice(UInt8)</code>).</p>
 <p>The yielded slices point into internal buffers that are reused on every
-iteration: they are only valid until the next record is read. To keep a
-value beyond the current iteration, copy it (<code>String.new(bytes)</code> or <code>bytes.dup</code>)
-or use <code><a href="../../Fastx/Fasta/Reader.html#each%28%26%3AString%2CString-%3E%29-instance-method">#each</a></code>.</p>
+iteration. They are backed by reader-owned reusable buffers, not
+guaranteed zero-copy views of the input stream, and are only valid until
+the next record is read. To keep a value beyond the current iteration,
+copy it (<code>String.new(bytes)</code> or <code>bytes.dup</code>) or use <code><a href="../../Fastx/Fasta/Reader.html#each%28%26%3AString%2CString-%3E%29-instance-method">#each</a></code>.</p>
         </div>
       
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/9b66fc35223edb291a293682b35829ee72728eb0/src/fastx/fasta/reader.cr#L105" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/442c5576c143ef243351237a6111c600c1b63036/src/fastx/fasta/reader.cr#L107" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -580,7 +582,8 @@ or use <code><a href="../../Fastx/Fasta/Reader.html#each%28%26%3AString%2CString
         <div class="doc">
           
           <p>Iterates over FASTA records while streaming sequence lines without
-accumulating the full sequence in memory.</p>
+accumulating the full sequence in memory. This is the lowest-memory
+FASTA reading API.</p>
 <p>The yielded name is an owned <code>String</code>. <code><a href="../../Fastx/Fasta/SequenceLines.html#each%28%26%3ABytes-%3E%29-instance-method">SequenceLines#each</a></code> yields
 borrowed <code>Bytes</code> slices into an internal buffer; each slice is only valid
 until the next line is read. Copy it (<code>String.new(bytes)</code> or <code>bytes.dup</code>)
@@ -592,7 +595,7 @@ future record-oriented API.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/9b66fc35223edb291a293682b35829ee72728eb0/src/fastx/fasta/reader.cr#L122" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/442c5576c143ef243351237a6111c600c1b63036/src/fastx/fasta/reader.cr#L125" target="_blank">View source</a>]
         
       </div>
     </div>

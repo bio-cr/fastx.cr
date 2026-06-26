@@ -208,7 +208,7 @@
   </h2>
   
     
-      <a href="https://github.com/bio-cr/fastx.cr/blob/9b66fc35223edb291a293682b35829ee72728eb0/src/fastx/fastq/writer.cr#L6" target="_blank">
+      <a href="https://github.com/bio-cr/fastx.cr/blob/442c5576c143ef243351237a6111c600c1b63036/src/fastx/fastq/writer.cr#L6" target="_blank">
         fastx/fastq/writer.cr
       </a>
     
@@ -291,7 +291,7 @@
       <li class="entry-summary">
         <a href="#close-instance-method" class="signature"><strong>#close</strong></a>
         
-          <div class="summary"><p>Closes the file handle.</p></div>
+          <div class="summary"><p>Closes the writer and its underlying IO.</p></div>
         
       </li>
     
@@ -419,7 +419,7 @@ Automatically detects gzip compression from .gz extension.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/9b66fc35223edb291a293682b35829ee72728eb0/src/fastx/fastq/writer.cr#L28" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/442c5576c143ef243351237a6111c600c1b63036/src/fastx/fastq/writer.cr#L28" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -435,13 +435,14 @@ Automatically detects gzip compression from .gz extension.</p>
         <div class="doc">
           
           <p>Creates a new FASTQ writer for an already opened IO stream.
-IO-based writers do not perform gzip auto-detection.</p>
+IO-based writers do not perform gzip auto-detection. The writer takes
+ownership of the IO and closes it when the writer is closed.</p>
         </div>
       
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/9b66fc35223edb291a293682b35829ee72728eb0/src/fastx/fastq/writer.cr#L37" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/442c5576c143ef243351237a6111c600c1b63036/src/fastx/fastq/writer.cr#L38" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -474,7 +475,7 @@ IO-based writers do not perform gzip auto-detection.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/9b66fc35223edb291a293682b35829ee72728eb0/src/fastx/fastq/writer.cr#L11" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/442c5576c143ef243351237a6111c600c1b63036/src/fastx/fastq/writer.cr#L11" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -495,7 +496,7 @@ IO-based writers do not perform gzip auto-detection.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/9b66fc35223edb291a293682b35829ee72728eb0/src/fastx/fastq/writer.cr#L19" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/442c5576c143ef243351237a6111c600c1b63036/src/fastx/fastq/writer.cr#L19" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -524,13 +525,13 @@ IO-based writers do not perform gzip auto-detection.</p>
       
         <div class="doc">
           
-          <p>Closes the file handle.</p>
+          <p>Closes the writer and its underlying IO.</p>
         </div>
       
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/9b66fc35223edb291a293682b35829ee72728eb0/src/fastx/fastq/writer.cr#L78" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/442c5576c143ef243351237a6111c600c1b63036/src/fastx/fastq/writer.cr#L79" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -551,7 +552,7 @@ IO-based writers do not perform gzip auto-detection.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/9b66fc35223edb291a293682b35829ee72728eb0/src/fastx/fastq/writer.cr#L86" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/442c5576c143ef243351237a6111c600c1b63036/src/fastx/fastq/writer.cr#L87" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -572,7 +573,7 @@ IO-based writers do not perform gzip auto-detection.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/9b66fc35223edb291a293682b35829ee72728eb0/src/fastx/fastq/writer.cr#L45" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/442c5576c143ef243351237a6111c600c1b63036/src/fastx/fastq/writer.cr#L46" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -593,7 +594,7 @@ IO-based writers do not perform gzip auto-detection.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/9b66fc35223edb291a293682b35829ee72728eb0/src/fastx/fastq/writer.cr#L45" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/442c5576c143ef243351237a6111c600c1b63036/src/fastx/fastq/writer.cr#L46" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -614,7 +615,7 @@ IO-based writers do not perform gzip auto-detection.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/9b66fc35223edb291a293682b35829ee72728eb0/src/fastx/fastq/writer.cr#L45" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/442c5576c143ef243351237a6111c600c1b63036/src/fastx/fastq/writer.cr#L46" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -635,7 +636,7 @@ IO-based writers do not perform gzip auto-detection.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/9b66fc35223edb291a293682b35829ee72728eb0/src/fastx/fastq/writer.cr#L45" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/442c5576c143ef243351237a6111c600c1b63036/src/fastx/fastq/writer.cr#L46" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -656,7 +657,7 @@ IO-based writers do not perform gzip auto-detection.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/9b66fc35223edb291a293682b35829ee72728eb0/src/fastx/fastq/writer.cr#L45" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/442c5576c143ef243351237a6111c600c1b63036/src/fastx/fastq/writer.cr#L46" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -677,7 +678,7 @@ IO-based writers do not perform gzip auto-detection.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/9b66fc35223edb291a293682b35829ee72728eb0/src/fastx/fastq/writer.cr#L45" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/442c5576c143ef243351237a6111c600c1b63036/src/fastx/fastq/writer.cr#L46" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -698,7 +699,7 @@ IO-based writers do not perform gzip auto-detection.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/9b66fc35223edb291a293682b35829ee72728eb0/src/fastx/fastq/writer.cr#L45" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/442c5576c143ef243351237a6111c600c1b63036/src/fastx/fastq/writer.cr#L46" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -719,7 +720,7 @@ IO-based writers do not perform gzip auto-detection.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/9b66fc35223edb291a293682b35829ee72728eb0/src/fastx/fastq/writer.cr#L61" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/442c5576c143ef243351237a6111c600c1b63036/src/fastx/fastq/writer.cr#L62" target="_blank">View source</a>]
         
       </div>
     </div>
