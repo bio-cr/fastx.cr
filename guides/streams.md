@@ -20,9 +20,9 @@ end
 
 ## Borrowed Bytes
 
-`Reader#each_bytes` yields borrowed `Bytes` (`Slice(UInt8)`). Readers reuse
-internal buffers for performance, so yielded slices are only valid until the
-next iteration.
+`Reader#each_bytes` yields borrowed `Bytes` (`Slice(UInt8)`) backed by
+reader-owned reusable buffers. They are not guaranteed to be zero-copy views of
+the input stream. Yielded slices are only valid until the next record.
 
 Copy values you need to retain:
 
@@ -38,8 +38,9 @@ end
 
 ## Line Streams
 
-`Reader#each_record_lines` streams record fields line by line as borrowed
-`Bytes`. FASTA exposes sequence lines. FASTQ exposes sequence and quality lines.
+`Reader#each_record_lines` is the lowest-memory streaming path. It streams
+record fields line by line as borrowed `Bytes`. FASTA exposes sequence lines.
+FASTQ exposes sequence and quality lines.
 
 The name is intentionally specific. The shorter `Reader#each_record` name is
 reserved for a possible future record-oriented API.
@@ -79,6 +80,10 @@ may span multiple lines until the next header or end of file.
 ## Reader Lifetime
 
 Readers are one-pass. Create a new reader to read the same source again.
+
+Readers and writers take ownership of their IO. Closing a reader or writer also
+closes the underlying IO, including IO objects passed to IO-based constructors
+or `open` blocks.
 
 Reader and writer instances are not thread-safe.
 

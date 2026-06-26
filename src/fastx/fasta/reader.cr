@@ -79,7 +79,8 @@ module Fastx
       end
 
       # Creates a new FASTA reader for an already opened IO stream.
-      # IO-based readers do not perform gzip auto-detection.
+      # IO-based readers do not perform gzip auto-detection. The reader takes
+      # ownership of the IO and closes it when the reader is closed.
       def initialize(io : IO)
         @filename = nil
         @file = nil
@@ -99,9 +100,10 @@ module Fastx
       # `Bytes` (`Slice(UInt8)`).
       #
       # The yielded slices point into internal buffers that are reused on every
-      # iteration: they are only valid until the next record is read. To keep a
-      # value beyond the current iteration, copy it (`String.new(bytes)` or `bytes.dup`)
-      # or use `#each`.
+      # iteration. They are backed by reader-owned reusable buffers, not
+      # guaranteed zero-copy views of the input stream, and are only valid until
+      # the next record is read. To keep a value beyond the current iteration,
+      # copy it (`String.new(bytes)` or `bytes.dup`) or use `#each`.
       def each_bytes(& : Bytes, Bytes ->)
         ensure_not_consumed!
         each_buffered_record do |name, sequence|
@@ -110,7 +112,8 @@ module Fastx
       end
 
       # Iterates over FASTA records while streaming sequence lines without
-      # accumulating the full sequence in memory.
+      # accumulating the full sequence in memory. This is the lowest-memory
+      # FASTA reading API.
       #
       # The yielded name is an owned `String`. `SequenceLines#each` yields
       # borrowed `Bytes` slices into an internal buffer; each slice is only valid
@@ -142,7 +145,7 @@ module Fastx
         end
       end
 
-      # Closes the file handle.
+      # Closes the reader and its underlying IO.
       def close
         @io.close unless @io.closed?
 

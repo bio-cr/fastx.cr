@@ -75,7 +75,8 @@ end
 
 ## Use Existing IO
 
-IO-based APIs do not auto-detect gzip:
+IO-based APIs do not auto-detect gzip. Readers and writers take ownership of
+the IO, so closing them also closes the IO object you passed in:
 
 ```crystal
 io = IO::Memory.new("@seq1\nACGT\n+\n!!!!\n")

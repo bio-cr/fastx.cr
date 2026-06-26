@@ -4,8 +4,8 @@ Fastx readers are one-pass iterators over FASTA or FASTQ records. Choose the
 reader method by the shape of data you want:
 
 - `#each` yields owned `String` values.
-- `#each_bytes` yields borrowed `Bytes` for lower-allocation record iteration.
-- `#each_record_lines` streams sequence and quality lines without accumulating the full record fields.
+- `#each_bytes` yields borrowed `Bytes` backed by reader-owned reusable buffers.
+- `#each_record_lines` is the lowest-memory streaming API.
 
 See [Streams and limits](streams.md) for lifetime and FASTQ record-shape details.
 
@@ -27,14 +27,15 @@ allocations:
 ```crystal
 Fastx::Fasta::Reader.open("reads.fa") do |reader|
   reader.each_bytes do |header, sequence|
-    # header and sequence are borrowed Bytes (Slice(UInt8)),
-    # valid only until the next iteration.
+    # header and sequence are borrowed Bytes backed by reader-owned
+    # reusable buffers, valid only until the next record.
     puts "#{String.new(header)}\t#{sequence.size}"
   end
 end
 ```
 
-Use `#each_record_lines` when a sequence may be too large to accumulate:
+Use `#each_record_lines` for the lowest-memory path when a sequence may be too
+large to accumulate:
 
 ```crystal
 Fastx::Fasta::Reader.open("genome.fa") do |reader|
@@ -63,15 +64,17 @@ Use `#each_bytes` for lower-allocation record iteration:
 ```crystal
 Fastx::Fastq::Reader.open("reads.fq") do |reader|
   reader.each_bytes do |identifier, sequence, quality|
-    # All three are borrowed Bytes, valid only until the next iteration.
+    # All three are borrowed Bytes backed by reader-owned reusable buffers,
+    # valid only until the next record.
     puts "#{String.new(identifier)}\t#{sequence.size}\t#{quality.size}"
   end
 end
 ```
 
-`#each_record_lines` streams the sequence line and quality line as borrowed
-`Bytes`. The sequence line is consumed before quality automatically if you skip
-it, so sequence/quality length equality can still be validated:
+`#each_record_lines` is the lowest-memory FASTQ reading API. It streams the
+sequence line and quality line as borrowed `Bytes`. The sequence line is
+consumed before quality automatically if you skip it, so sequence/quality
+length equality can still be validated:
 
 ```crystal
 Fastx::Fastq::Reader.open("long_reads.fq") do |reader|
@@ -87,5 +90,6 @@ end
 ## Choosing a Method
 
 Use `#each` for straightforward application code. Use `#each_bytes` for
-record-level processing where allocations matter. Use `#each_record_lines` when
-a full FASTA sequence or a FASTQ sequence/quality line may be too large to copy.
+record-level processing where allocations matter and next-record lifetime is
+enough. Use `#each_record_lines` for the lowest-memory path when a full FASTA
+sequence or a FASTQ sequence/quality line may be too large to copy.

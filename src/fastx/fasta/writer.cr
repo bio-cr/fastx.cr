@@ -35,7 +35,8 @@ module Fastx
       end
 
       # Creates a new FASTA writer for an already opened IO stream.
-      # IO-based writers do not perform gzip auto-detection.
+      # IO-based writers do not perform gzip auto-detection. The writer takes
+      # ownership of the IO and closes it when the writer is closed.
       def initialize(io : IO, line_width : Int32? = nil)
         @file = nil
         @io = io
@@ -73,7 +74,7 @@ module Fastx
         end
       end
 
-      # Closes the file handle.
+      # Closes the writer and its underlying IO.
       def close
         @io.close unless @io.closed?
 
