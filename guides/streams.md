@@ -68,6 +68,11 @@ ACGT
 
 Use an external normalizer first if you need to read wrapped FASTQ input.
 
+## FASTA Record Shapes
+
+FASTA records must start with a header line beginning with `>`. Sequence lines
+may span multiple lines until the next header or end of file.
+
 ## Reader Lifetime
 
 Readers are one-pass. Create a new reader to read the same source again.

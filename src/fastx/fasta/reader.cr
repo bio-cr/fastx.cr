@@ -126,10 +126,11 @@ module Fastx
           name = pending_name
           pending_name = nil
 
-          until name
+          unless name
             line = lines.next_line
             return unless line
-            name = String.new(line[1, line.size - 1]) if fasta_header?(line)
+            ensure_header!(line)
+            name = String.new(line[1, line.size - 1])
           end
 
           sequence_lines = SequenceLines.new(lines, name, source_label, ->(next_name : String) { pending_name = next_name })
@@ -160,21 +161,24 @@ module Fastx
         name = IO::Memory.new
         sequence = IO::Memory.new
         lines = ByteLines.new(@io)
-        has_record = false
+        line = lines.next_line
+        return unless line
+        ensure_header!(line)
+
+        name.write(line[1, line.size - 1])
 
         while line = lines.next_line
-          if line.size > 0 && line[0] == 0x3Eu8
-            yield name.to_slice, sequence.to_slice if has_record
+          if fasta_header?(line)
+            yield name.to_slice, sequence.to_slice
             name.clear
             name.write(line[1, line.size - 1])
             sequence.clear
-            has_record = true
           else
             append_ascii_line!(sequence, line, name)
           end
         end
 
-        yield name.to_slice, sequence.to_slice if has_record
+        yield name.to_slice, sequence.to_slice
       end
 
       private def append_ascii_line!(sequence : IO::Memory, line : Bytes, name : IO::Memory)
@@ -189,6 +193,12 @@ module Fastx
         line.each do |byte|
           raise InvalidCharacterError.new(source_label, name, String.new(line)) if byte > 0x7Fu8
         end
+      end
+
+      private def ensure_header!(line : Bytes) : Nil
+        return if fasta_header?(line)
+
+        raise InvalidFormatError.new(source_label, 1, String.new(line), "Header line must start with '>'")
       end
 
       private def fasta_header?(line : Bytes) : Bool

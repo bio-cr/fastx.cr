@@ -58,6 +58,18 @@ describe Fastx::Fasta::Reader do
     tempfile.delete
   end
 
+  it "should raise InvalidFormatError when the first line is not a header" do
+    io = IO::Memory.new("comment\n>seq1\nACGT\n")
+    reader = Fastx::Fasta::Reader.new(io)
+
+    expect_raises(Fastx::InvalidFormatError, /Header line must start with '>'/) do
+      reader.each do |_, _|
+      end
+    end
+
+    reader.close
+  end
+
   it "should read a fasta file with each_bytes" do
     reader = Fastx::Fasta::Reader.new(Path[__DIR__, "fixtures/moo.fa"])
     c = 0
@@ -135,6 +147,18 @@ describe Fastx::Fasta::Reader do
     end
     reader.close
     tempfile.delete
+  end
+
+  it "should raise InvalidFormatError from each_record_lines when the first line is not a header" do
+    io = IO::Memory.new("comment\n>seq1\nACGT\n")
+    reader = Fastx::Fasta::Reader.new(io)
+
+    expect_raises(Fastx::InvalidFormatError, /Header line must start with '>'/) do
+      reader.each_record_lines do |_, _|
+      end
+    end
+
+    reader.close
   end
 
   it "should support reading from IO::Memory" do
