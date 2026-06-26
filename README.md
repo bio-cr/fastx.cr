@@ -72,11 +72,11 @@ end
 
 ## Guides
 
-- [Getting started](guide/getting-started.md)
-- [Reading FASTA and FASTQ](guide/reading.md)
-- [Writing FASTA and FASTQ](guide/writing.md)
-- [Streams and limits](guide/streams.md)
-- [Base and quality encoding](guide/encoding.md)
+- [Getting started](guides/getting-started.md)
+- [Reading FASTA and FASTQ](guides/reading.md)
+- [Writing FASTA and FASTQ](guides/writing.md)
+- [Streams and limits](guides/streams.md)
+- [Base and quality encoding](guides/encoding.md)
 
 ## License
 
