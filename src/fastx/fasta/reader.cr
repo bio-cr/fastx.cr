@@ -90,7 +90,7 @@ module Fastx
       # `String` copies that remain valid after iteration.
       def each(& : String, String ->)
         ensure_not_consumed!
-        each_record do |name, sequence|
+        each_buffered_record do |name, sequence|
           yield String.new(name), String.new(sequence)
         end
       end
@@ -104,7 +104,7 @@ module Fastx
       # or use `#each`.
       def each_bytes(& : Bytes, Bytes ->)
         ensure_not_consumed!
-        each_record do |name, sequence|
+        each_buffered_record do |name, sequence|
           yield name, sequence
         end
       end
@@ -160,7 +160,7 @@ module Fastx
         @consumed = true
       end
 
-      private def each_record(&)
+      private def each_buffered_record(&)
         name = IO::Memory.new
         sequence = IO::Memory.new
         lines = ByteLines.new(@io)

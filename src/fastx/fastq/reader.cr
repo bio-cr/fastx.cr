@@ -180,7 +180,7 @@ module Fastx
       # as owned `String` copies that remain valid after iteration.
       def each(& : String, String, String ->)
         ensure_not_consumed!
-        each_record do |identifier, sequence, quality|
+        each_buffered_record do |identifier, sequence, quality|
           yield String.new(identifier), String.new(sequence), String.new(quality)
         end
       end
@@ -194,7 +194,7 @@ module Fastx
       # or use `#each`.
       def each_bytes(& : Bytes, Bytes, Bytes ->)
         ensure_not_consumed!
-        each_record do |identifier, sequence, quality|
+        each_buffered_record do |identifier, sequence, quality|
           yield identifier, sequence, quality
         end
       end
@@ -251,7 +251,7 @@ module Fastx
         @consumed = true
       end
 
-      private def each_record(&)
+      private def each_buffered_record(&)
         identifier = IO::Memory.new
         sequence = IO::Memory.new
         quality = IO::Memory.new
