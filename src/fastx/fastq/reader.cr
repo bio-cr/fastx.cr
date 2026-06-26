@@ -210,6 +210,9 @@ module Fastx
       #
       # The sequence line is consumed before quality (automatically, if the
       # caller skips it) so sequence/quality length equality can be validated.
+      #
+      # The specific method name leaves `#each_record` available for a possible
+      # future record-oriented API.
       def each_record_lines(& : String, SequenceLines, QualityLines ->)
         ensure_not_consumed!
 

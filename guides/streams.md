@@ -41,6 +41,9 @@ end
 `Reader#each_record_lines` streams record fields line by line as borrowed
 `Bytes`. FASTA exposes sequence lines. FASTQ exposes sequence and quality lines.
 
+The name is intentionally specific. The shorter `Reader#each_record` name is
+reserved for a possible future record-oriented API.
+
 This is a low-memory API rather than the fastest record-level API. Use it when
 you do not want to accumulate an entire sequence or quality field.
 

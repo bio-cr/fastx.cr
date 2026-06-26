@@ -116,6 +116,9 @@ module Fastx
       # borrowed `Bytes` slices into an internal buffer; each slice is only valid
       # until the next line is read. Copy it (`String.new(bytes)` or `bytes.dup`)
       # to keep it.
+      #
+      # The specific method name leaves `#each_record` available for a possible
+      # future record-oriented API.
       def each_record_lines(& : String, SequenceLines ->)
         ensure_not_consumed!
 
