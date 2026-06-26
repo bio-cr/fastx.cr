@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.3.0
+
+### Changes
+
+- FASTQ readers now support conventional four-line FASTQ records only; wrapped
+  or multi-line FASTQ records are rejected.
+- FASTA readers now require the first input line to start with `>`.
+
+### Performance
+
+- Simplified the FASTQ buffered reader around the four-line FASTQ shape.
+
+### Documentation
+
+- Clarified `#each_bytes` buffer lifetimes, `#each_record_lines` memory usage,
+  IO ownership, and why `#each_record` is reserved.
+
+### Internal
+
+- Renamed private buffered-reader helpers and removed unused FASTA reader code.
+
 ## 0.2.0
 
 ### API
