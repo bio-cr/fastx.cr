@@ -256,44 +256,33 @@ module Fastx
         sequence = IO::Memory.new
         quality = IO::Memory.new
         lines = ByteLines.new(@io)
-        next_field = FIELD::IDENTIFIER
         line_number = 0
-        quality_line_number = 0
-        has_record = false
 
-        while line = lines.next_line
+        while identifier_line = lines.next_line
           line_number += 1
-          case next_field
-          when FIELD::IDENTIFIER
-            ensure_prefix!(line, 0x40u8, line_number, "Identifier line must start with '@'")
+          ensure_prefix!(identifier_line, 0x40u8, line_number, "Identifier line must start with '@'")
 
-            if has_record
-              yield_record(identifier, sequence, quality, quality_line_number) do |id, seq, qual|
-                yield id, seq, qual
-              end
-            end
-            identifier.clear
-            identifier.write(line[1, line.size - 1])
-            sequence.clear
-            quality.clear
-            has_record = true
-            next_field = FIELD::SEQUENCE
-          when FIELD::SEQUENCE
-            append_ascii_line!(sequence, line, identifier)
-            next_field = FIELD::PLUS
-          when FIELD::PLUS
-            ensure_prefix!(line, 0x2Bu8, line_number, "Plus line must start with '+'")
-            next_field = FIELD::QUALITY
-          when FIELD::QUALITY
-            append_ascii_line!(quality, line, identifier)
-            quality_line_number = line_number
-            next_field = FIELD::IDENTIFIER
-          end
-        end
+          identifier.clear
+          identifier.write(identifier_line[1, identifier_line.size - 1])
+          sequence.clear
+          quality.clear
 
-        raise_incomplete_record_error(next_field, line_number) unless next_field == FIELD::IDENTIFIER
-        if has_record
-          yield_record(identifier, sequence, quality, quality_line_number) do |id, seq, qual|
+          sequence_line = lines.next_line
+          raise_incomplete_record_error("sequence", line_number) if sequence_line.nil?
+          line_number += 1
+          append_ascii_line!(sequence, sequence_line, identifier)
+
+          plus_line = lines.next_line
+          raise_incomplete_record_error("'+' separator", line_number) if plus_line.nil?
+          line_number += 1
+          ensure_prefix!(plus_line, 0x2Bu8, line_number, "Plus line must start with '+'")
+
+          quality_line = lines.next_line
+          raise_incomplete_record_error("quality", line_number) if quality_line.nil?
+          line_number += 1
+          append_ascii_line!(quality, quality_line, identifier)
+
+          yield_record(identifier, sequence, quality, line_number) do |id, seq, qual|
             yield id, seq, qual
           end
         end
@@ -329,8 +318,8 @@ module Fastx
         )
       end
 
-      private def raise_incomplete_record_error(next_field : FIELD, line_number : Int32)
-        raise InvalidFormatError.new(source_label, line_number, "", "Incomplete FASTQ record: expected #{next_field}")
+      private def raise_incomplete_record_error(expected : String, line_number : Int32)
+        raise InvalidFormatError.new(source_label, line_number, "", "Incomplete FASTQ record: expected #{expected}")
       end
 
       private def source_label

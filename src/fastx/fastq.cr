@@ -3,14 +3,6 @@ require "./fastq/writer"
 
 module Fastx
   module Fastq
-    # FASTQ record field types for parsing state machine.
-    enum FIELD : UInt8
-      IDENTIFIER = 0
-      SEQUENCE   = 1
-      PLUS       = 2
-      QUALITY    = 3
-    end
-
     # Opens a FASTQ file for reading ("r") or writing ("w").
     # Yields the Reader/Writer to the block and automatically closes it.
     def self.open(filename, mode = "r", &) # block given
