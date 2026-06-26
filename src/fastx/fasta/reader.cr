@@ -192,12 +192,6 @@ module Fastx
         sequence.write(line)
       end
 
-      private def validate_ascii_line!(line : Bytes, name : String)
-        line.each do |byte|
-          raise InvalidCharacterError.new(source_label, name, String.new(line)) if byte > 0x7Fu8
-        end
-      end
-
       private def ensure_header!(line : Bytes) : Nil
         return if fasta_header?(line)
 
