@@ -54,6 +54,19 @@ describe Fastx::Fasta::Writer do
     tempfile.delete
   end
 
+  it "should reject an invalid line width before opening the output file" do
+    tempfile = File.tempfile("existing.fa")
+    File.write(tempfile.path, "original content")
+
+    expect_raises(ArgumentError, "line_width must be positive") do
+      Fastx::Fasta::Writer.new(tempfile.path, line_width: 0)
+    end
+
+    File.read(tempfile.path).should eq("original content")
+  ensure
+    tempfile.try &.delete
+  end
+
   it "should write a fasta record from bytes" do
     io = IO::Memory.new
     writer = Fastx::Fasta::Writer.new(io, line_width: 4)

@@ -27,11 +27,11 @@ module Fastx
       # Creates a new FASTA writer for the specified file.
       # Automatically detects gzip compression from .gz extension.
       def initialize(filename : String | Path, line_width : Int32? = nil)
+        @line_width = normalize_line_width(line_width)
         filename = Path.new(filename)
         file = File.open(filename, "w")
         @file = file
         @io = filename.extension == ".gz" ? Compress::Gzip::Writer.new(file) : file
-        @line_width = normalize_line_width(line_width)
       end
 
       # Creates a new FASTA writer for an already opened IO stream.
