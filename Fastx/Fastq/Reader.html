@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Crystal Docs 1.19.1">
+<meta name="generator" content="Crystal Docs 1.21.0">
 <meta name="crystal_docs.project_version" content="main">
 <meta name="crystal_docs.project_name" content="fastx">
 
@@ -208,7 +208,7 @@
   </h2>
   
     
-      <a href="https://github.com/bio-cr/fastx.cr/blob/79d059fa7bc9681ab2b8e35b92b54efee45c362a/src/fastx/fastq/reader.cr#L139" target="_blank">
+      <a href="https://github.com/bio-cr/fastx.cr/blob/710d565496766b1c6869dec48171e8f48cc08f40/src/fastx/fastq/reader.cr#L139" target="_blank">
         fastx/fastq/reader.cr
       </a>
     
@@ -238,7 +238,7 @@
       </li>
     
       <li class="entry-summary">
-        <a href="#new%28io%3AIO%29-class-method" class="signature"><strong>.new</strong>(io : IO)</a>
+        <a href="#new%28io%3AIO%2C%2A%2Csync_close%3ABool%3Dfalse%29-class-method" class="signature"><strong>.new</strong>(io : IO, *, sync_close : Bool = <span class="n">false</span>)</a>
         
           <div class="summary"><p>Creates a new FASTQ reader for an already opened IO stream.</p></div>
         
@@ -266,7 +266,7 @@
       </li>
     
       <li class="entry-summary">
-        <a href="#open%28io%3AIO%2C%26%29-class-method" class="signature"><strong>.open</strong>(io : IO, &)</a>
+        <a href="#open%28io%3AIO%2C%2A%2Csync_close%3ABool%3Dfalse%2C%26%29-class-method" class="signature"><strong>.open</strong>(io : IO, *, sync_close : Bool = <span class="n">false</span>, &)</a>
         
           <div class="summary"><p>Opens a FASTQ stream, yields the reader to the block, and automatically closes it.</p></div>
         
@@ -291,14 +291,14 @@
       <li class="entry-summary">
         <a href="#close-instance-method" class="signature"><strong>#close</strong></a>
         
-          <div class="summary"><p>Closes the reader and its underlying IO.</p></div>
+          <div class="summary"><p>Closes the reader and, when owned, its underlying IO.</p></div>
         
       </li>
     
       <li class="entry-summary">
         <a href="#closed%3F-instance-method" class="signature"><strong>#closed?</strong></a>
         
-          <div class="summary"><p>Returns true if the file handle is closed.</p></div>
+          <div class="summary"><p>Returns true if the reader is closed.</p></div>
         
       </li>
     
@@ -384,30 +384,30 @@ Automatically detects gzip compression from .gz extension.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/79d059fa7bc9681ab2b8e35b92b54efee45c362a/src/fastx/fastq/reader.cr#L163" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/710d565496766b1c6869dec48171e8f48cc08f40/src/fastx/fastq/reader.cr#L165" target="_blank">View source</a>]
         
       </div>
     </div>
   
-    <div class="entry-detail" id="new(io:IO)-class-method">
+    <div class="entry-detail" id="new(io:IO,*,sync_close:Bool=false)-class-method">
       <div class="signature">
         
-        def self.<strong>new</strong>(io : IO)
+        def self.<strong>new</strong>(io : IO, *, sync_close : Bool = <span class="n">false</span>)
 
-        <a class="method-permalink" href="#new%28io%3AIO%29-class-method">#</a>
+        <a class="method-permalink" href="#new%28io%3AIO%2C%2A%2Csync_close%3ABool%3Dfalse%29-class-method">#</a>
       </div>
       
         <div class="doc">
           
           <p>Creates a new FASTQ reader for an already opened IO stream.
-IO-based readers do not perform gzip auto-detection. The reader takes
-ownership of the IO and closes it when the reader is closed.</p>
+IO-based readers do not perform gzip auto-detection. The reader closes
+the IO when <code>sync_close: true</code> is specified.</p>
         </div>
       
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/79d059fa7bc9681ab2b8e35b92b54efee45c362a/src/fastx/fastq/reader.cr#L174" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/710d565496766b1c6869dec48171e8f48cc08f40/src/fastx/fastq/reader.cr#L176" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -440,17 +440,17 @@ ownership of the IO and closes it when the reader is closed.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/79d059fa7bc9681ab2b8e35b92b54efee45c362a/src/fastx/fastq/reader.cr#L146" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/710d565496766b1c6869dec48171e8f48cc08f40/src/fastx/fastq/reader.cr#L148" target="_blank">View source</a>]
         
       </div>
     </div>
   
-    <div class="entry-detail" id="open(io:IO,&amp;)-class-method">
+    <div class="entry-detail" id="open(io:IO,*,sync_close:Bool=false,&amp;)-class-method">
       <div class="signature">
         
-        def self.<strong>open</strong>(io : IO, &)
+        def self.<strong>open</strong>(io : IO, *, sync_close : Bool = <span class="n">false</span>, &)
 
-        <a class="method-permalink" href="#open%28io%3AIO%2C%26%29-class-method">#</a>
+        <a class="method-permalink" href="#open%28io%3AIO%2C%2A%2Csync_close%3ABool%3Dfalse%2C%26%29-class-method">#</a>
       </div>
       
         <div class="doc">
@@ -461,7 +461,7 @@ ownership of the IO and closes it when the reader is closed.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/79d059fa7bc9681ab2b8e35b92b54efee45c362a/src/fastx/fastq/reader.cr#L154" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/710d565496766b1c6869dec48171e8f48cc08f40/src/fastx/fastq/reader.cr#L156" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -490,13 +490,13 @@ ownership of the IO and closes it when the reader is closed.</p>
       
         <div class="doc">
           
-          <p>Closes the reader and its underlying IO.</p>
+          <p>Closes the reader and, when owned, its underlying IO.</p>
         </div>
       
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/79d059fa7bc9681ab2b8e35b92b54efee45c362a/src/fastx/fastq/reader.cr#L239" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/710d565496766b1c6869dec48171e8f48cc08f40/src/fastx/fastq/reader.cr#L242" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -511,13 +511,13 @@ ownership of the IO and closes it when the reader is closed.</p>
       
         <div class="doc">
           
-          <p>Returns true if the file handle is closed.</p>
+          <p>Returns true if the reader is closed.</p>
         </div>
       
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/79d059fa7bc9681ab2b8e35b92b54efee45c362a/src/fastx/fastq/reader.cr#L247" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/710d565496766b1c6869dec48171e8f48cc08f40/src/fastx/fastq/reader.cr#L253" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -539,7 +539,7 @@ as owned <code>String</code> copies that remain valid after iteration.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/79d059fa7bc9681ab2b8e35b92b54efee45c362a/src/fastx/fastq/reader.cr#L182" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/710d565496766b1c6869dec48171e8f48cc08f40/src/fastx/fastq/reader.cr#L185" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -566,7 +566,7 @@ copy it (<code>String.new(bytes)</code> or <code>bytes.dup</code>) or use <code>
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/79d059fa7bc9681ab2b8e35b92b54efee45c362a/src/fastx/fastq/reader.cr#L197" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/710d565496766b1c6869dec48171e8f48cc08f40/src/fastx/fastq/reader.cr#L200" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -597,7 +597,7 @@ future record-oriented API.</p>
       <br/>
       <div>
         
-          [<a href="https://github.com/bio-cr/fastx.cr/blob/79d059fa7bc9681ab2b8e35b92b54efee45c362a/src/fastx/fastq/reader.cr#L218" target="_blank">View source</a>]
+          [<a href="https://github.com/bio-cr/fastx.cr/blob/710d565496766b1c6869dec48171e8f48cc08f40/src/fastx/fastq/reader.cr#L221" target="_blank">View source</a>]
         
       </div>
     </div>
