@@ -50,6 +50,8 @@ module Fastx
       @filename : Path?
       @file : File?
       @io : IO
+      @sync_close = true
+      @closed = false
       @consumed = false
 
       # Opens a FASTA file, yields the reader to the block, and automatically closes it.
@@ -61,8 +63,8 @@ module Fastx
       end
 
       # Opens a FASTA stream, yields the reader to the block, and automatically closes it.
-      def self.open(io : IO, &)
-        reader = new(io)
+      def self.open(io : IO, *, sync_close : Bool = false, &)
+        reader = new(io, sync_close: sync_close)
         yield reader
       ensure
         reader.try &.close
@@ -79,12 +81,13 @@ module Fastx
       end
 
       # Creates a new FASTA reader for an already opened IO stream.
-      # IO-based readers do not perform gzip auto-detection. The reader takes
-      # ownership of the IO and closes it when the reader is closed.
-      def initialize(io : IO)
+      # IO-based readers do not perform gzip auto-detection. The reader closes
+      # the IO when `sync_close: true` is specified.
+      def initialize(io : IO, *, sync_close : Bool = false)
         @filename = nil
         @file = nil
         @io = io
+        @sync_close = sync_close
       end
 
       # Iterates over each FASTA record, yielding name and sequence as owned
@@ -145,20 +148,24 @@ module Fastx
         end
       end
 
-      # Closes the reader and its underlying IO.
+      # Closes the reader and, when owned, its underlying IO.
       def close
-        @io.close unless @io.closed?
+        return if @closed
+
+        @io.close if @sync_close && !@io.closed?
 
         file = @file
         file.close if file && !file.closed?
+        @closed = true
       end
 
-      # Returns true if the file handle is closed.
+      # Returns true if the reader is closed.
       def closed?
-        @io.closed?
+        @closed || @io.closed?
       end
 
       private def ensure_not_consumed!
+        raise IO::Error.new("Reader is closed") if closed?
         raise ReaderConsumedError.new if @consumed
         @consumed = true
       end

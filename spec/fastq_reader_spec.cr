@@ -159,6 +159,53 @@ describe Fastx::Fastq::Reader do
     reader.close
   end
 
+  it "should leave an IO open unless sync_close is enabled" do
+    io = IO::Memory.new("@test\nACGT\n+\n!!!!\n")
+    reader = Fastx::Fastq::Reader.new(io)
+
+    reader.close
+
+    reader.closed?.should be_true
+    io.closed?.should be_false
+    expect_raises(IO::Error, "Reader is closed") do
+      reader.each { |_, _, _| }
+    end
+
+    reader = Fastx::Fastq::Reader.new(io, sync_close: true)
+    reader.close
+    io.closed?.should be_true
+  end
+
+  it "should support sync_close in the open block" do
+    io = IO::Memory.new("@test\nACGT\n+\n!!!!\n")
+
+    Fastx::Fastq::Reader.open(io, sync_close: true) do |reader|
+      reader.closed?.should be_false
+    end
+
+    io.closed?.should be_true
+  end
+
+  it "should leave the IO open after an open block by default" do
+    io = IO::Memory.new("@test\nACGT\n+\n!!!!\n")
+
+    Fastx::Fastq::Reader.open(io) do |reader|
+      reader.each { |id, sequence, quality| {id, sequence, quality}.should eq({"test", "ACGT", "!!!!"}) }
+    end
+
+    io.closed?.should be_false
+  end
+
+  it "should report a consumed reader as closed after close" do
+    reader = Fastx::Fastq::Reader.new(IO::Memory.new("@test\nACGT\n+\n!!!!\n"))
+    reader.each { |_, _, _| }
+    reader.close
+
+    expect_raises(IO::Error, "Reader is closed") do
+      reader.each { |_, _, _| }
+    end
+  end
+
   it "should read CRLF line endings" do
     io = IO::Memory.new("@test\r\nACGT\r\n+\r\n!!!!\r\n")
     reader = Fastx::Fastq::Reader.new(io)
