@@ -64,7 +64,7 @@ module Fastx
   def self.decode_phred(scores : Enumerable(UInt8), offset = 33) : String
     String.build do |io|
       scores.each do |score|
-        io << (score + offset).chr
+        io.write_byte((score + offset).to_u8)
       end
     end
   end

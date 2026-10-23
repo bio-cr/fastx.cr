@@ -257,6 +257,12 @@ describe Fastx do
     decoded.should eq quality
   end
 
+  it "should decode phred scores consistently from arrays and enumerables" do
+    scores = [100u8]
+
+    Fastx.decode_phred(scores.each).should eq Fastx.decode_phred(scores)
+  end
+
   it "should work with Format enum for FASTQ" do
     tempfile = File.tempfile("test_file")
 
