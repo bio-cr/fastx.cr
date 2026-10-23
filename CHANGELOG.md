@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.3.1
+
+### API
+
+- IO-based FASTA and FASTQ readers now leave caller-provided IO open by default,
+  including in `Reader.open` blocks. Pass `sync_close: true` to close it with the
+  reader. Readers opened from a filename continue to close their files.
+
+### Fixes
+
+- Validate FASTA `line_width` before opening the output file, preserving an
+  existing file when the value is invalid.
+- Report FASTQ, rather than FASTA, in non-ASCII FASTQ error messages.
+- Decode Phred scores consistently for arrays and other enumerables.
+- Report a closed reader as closed when it has already been consumed.
+
+### Documentation
+
+- Clarified reader and writer IO ownership in the guides.
+
 ## 0.3.0
 
 ### Changes
