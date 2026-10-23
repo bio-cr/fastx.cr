@@ -53,7 +53,7 @@ module Fastx
                         {Bytes, Bytes, String},
                       ] %}
         # Writes a FASTQ record with the given identifier, sequence, and quality.
-        def write(identifier : {{types[0]}}, sequence : {{types[1]}}, quality : {{types[2]}})
+        def write(identifier : {{ types[0] }}, sequence : {{ types[1] }}, quality : {{ types[2] }})
           write(bytes(identifier), bytes(sequence), bytes(quality))
         end
       {% end %}

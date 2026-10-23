@@ -48,7 +48,7 @@ module Fastx
       # --release benchmark, so keep the overloads and route them to the Bytes core.
       {% for types in [{String, String}, {String, Bytes}, {Bytes, String}] %}
         # Writes a FASTA record with the given name and sequence.
-        def write(name : {{types[0]}}, sequence : {{types[1]}})
+        def write(name : {{ types[0] }}, sequence : {{ types[1] }})
           write(bytes(name), bytes(sequence))
         end
       {% end %}
