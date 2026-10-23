@@ -81,9 +81,10 @@ may span multiple lines until the next header or end of file.
 
 Readers are one-pass. Create a new reader to read the same source again.
 
-Readers and writers take ownership of their IO. Closing a reader or writer also
-closes the underlying IO, including IO objects passed to IO-based constructors
-or `open` blocks.
+Readers opened from a filename own the file they open. For IO-based reader
+constructors and `open` blocks, the passed IO remains open by default; specify
+`sync_close: true` to close it when the reader closes. Writers take ownership
+of their IO, so closing a writer also closes the underlying IO.
 
 Reader and writer instances are not thread-safe.
 

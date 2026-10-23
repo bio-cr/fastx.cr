@@ -75,8 +75,9 @@ end
 
 ## Use Existing IO
 
-IO-based APIs do not auto-detect gzip. Readers and writers take ownership of
-the IO, so closing them also closes the IO object you passed in:
+IO-based APIs do not auto-detect gzip. Readers leave the IO open by default;
+specify `sync_close: true` if the reader should close it. Writers take
+ownership of the IO:
 
 ```crystal
 io = IO::Memory.new("@seq1\nACGT\n+\n!!!!\n")
@@ -85,4 +86,13 @@ reader = Fastx::Fastq::Reader.new(io)
 reader.each do |identifier, sequence, quality|
   puts "#{identifier}\t#{sequence}\t#{quality}"
 end
+
+reader.close
+io.closed? # => false
+
+# To have the reader close the IO:
+owned_io = IO::Memory.new("@seq1\nACGT\n+\n!!!!\n")
+reader = Fastx::Fastq::Reader.new(owned_io, sync_close: true)
+reader.close
+owned_io.closed? # => true
 ```
