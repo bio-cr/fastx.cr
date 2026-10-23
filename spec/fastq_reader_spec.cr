@@ -71,6 +71,14 @@ describe Fastx::Fastq::Reader do
     tempfile.delete
   end
 
+  it "should identify FASTQ in non-ASCII error messages" do
+    reader = Fastx::Fastq::Reader.new(IO::Memory.new("@test\nAC\u{1F600}\n+\n!!!\n"))
+
+    expect_raises(Fastx::InvalidCharacterError, /Non-ASCII characters in FASTQ file/) do
+      reader.each { |_, _, _| }
+    end
+  end
+
   it "should raise InvalidCharacterError for non-ASCII characters in quality" do
     tempfile = File.tempfile("invalid.fq")
     File.write(tempfile.path, "@test\nACGTACGT\n+\n!!!\u{1F600}!!!\n")

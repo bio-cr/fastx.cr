@@ -6,8 +6,8 @@ module Fastx
   end
 
   class InvalidCharacterError < FastxError
-    def initialize(filename, name, sequence)
-      super("Non-ASCII characters in FASTA file: #{filename}\n  #{name}\n  #{sequence}")
+    def initialize(filename, name, sequence, format = "FASTA")
+      super("Non-ASCII characters in #{format} file: #{filename}\n  #{name}\n  #{sequence}")
     end
   end
 

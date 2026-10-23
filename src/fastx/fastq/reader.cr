@@ -63,7 +63,7 @@ module Fastx
 
       private def validate_ascii!(line : Bytes) : Nil
         line.each do |byte|
-          raise InvalidCharacterError.new(@source_label, @id, String.new(line)) if byte > 0x7Fu8
+          raise InvalidCharacterError.new(@source_label, @id, String.new(line), "FASTQ") if byte > 0x7Fu8
         end
       end
 
@@ -305,7 +305,7 @@ module Fastx
 
       private def append_ascii_line!(buffer : IO::Memory, line : Bytes, identifier : IO::Memory)
         line.each do |byte|
-          raise InvalidCharacterError.new(source_label, String.new(identifier.to_slice), String.new(line)) if byte > 0x7Fu8
+          raise InvalidCharacterError.new(source_label, String.new(identifier.to_slice), String.new(line), "FASTQ") if byte > 0x7Fu8
         end
 
         buffer.write(line)
